@@ -89,11 +89,19 @@ class Recorder:
 
     def _is_image_same(self, file1, file2):
         with Image.open(file1) as im1, Image.open(file2) as im2:
-            diff_image = ImageChops.difference(im1, im2)
-            try:
-                return diff_image.getbbox() is None
-            finally:
-                diff_image.close()
+            assert im1.mode == im2.mode, "Different kinds of images."
+            assert im1.size == im2.size, "Different sizes."
+
+            pairs = zip(im1.getdata(), im2.getdata())
+            if len(im1.getbands()) == 1:
+                # for gray-scale jpegs
+                dif = sum(abs(p1 - p2) for p1, p2 in pairs)
+            else:
+                dif = sum(abs(c1 - c2) for p1, p2 in pairs for c1, c2 in zip(p1, p2))
+
+            ncomponents = im1.size[0] * im1.size[1] * 3
+            likeliness = (dif / 255.0 * 100) / ncomponents
+            return likeliness < 0.98
 
     def record(self):
         self._clean()
