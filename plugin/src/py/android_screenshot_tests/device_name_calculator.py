@@ -1,6 +1,6 @@
 import re
 
-from adb_executor import AdbExecutor
+from .adb_executor import AdbExecutor
 
 
 class DeviceNameCalculator:

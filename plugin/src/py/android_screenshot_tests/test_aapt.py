@@ -4,12 +4,12 @@ from __future__ import print_function
 from __future__ import unicode_literals
 
 import unittest
-import aapt
+from . import aapt
 import os
 import tempfile
 import shutil
 from os.path import join, dirname
-from common import assertRegex
+from .common import assertRegex
 
 CURDIR = dirname(__file__)
 

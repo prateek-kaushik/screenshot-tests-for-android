@@ -19,13 +19,13 @@ from __future__ import print_function
 from __future__ import unicode_literals
 
 import unittest
-from simple_puller import SimplePuller
+from .simple_puller import SimplePuller
 import subprocess
 import tempfile
-from common import get_adb
+from .common import get_adb
 import shutil
 import os
-import common
+from . import common
 
 class TestSimplePuller(unittest.TestCase):
     def setUp(self):

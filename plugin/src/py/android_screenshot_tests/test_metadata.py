@@ -22,7 +22,7 @@ import tempfile
 import shutil
 import os
 import xml.etree.ElementTree as ET
-import metadata
+from . import metadata
 
 # Tests for the metadata package
 class TestMetadata(unittest.TestCase):

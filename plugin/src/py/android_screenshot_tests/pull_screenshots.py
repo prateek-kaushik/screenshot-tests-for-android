@@ -29,12 +29,12 @@ import tempfile
 import xml.etree.ElementTree as ET
 import zipfile
 
-import aapt
-import common
-import metadata
-from device_name_calculator import DeviceNameCalculator
-from no_op_device_name_calculator import NoOpDeviceNameCalculator
-from simple_puller import SimplePuller
+from . import aapt
+from . import common
+from . import metadata
+from .device_name_calculator import DeviceNameCalculator
+from .no_op_device_name_calculator import NoOpDeviceNameCalculator
+from .simple_puller import SimplePuller
 
 from os.path import join
 from os.path import abspath
@@ -410,7 +410,7 @@ def pull_screenshots(process,
 
     if record or verify:
         # don't import this early, since we need PIL to import this
-        from recorder import Recorder
+        from .recorder import Recorder
         recorder = Recorder(temp_dir, record_dir or verify_dir)
         if verify:
             recorder.verify()

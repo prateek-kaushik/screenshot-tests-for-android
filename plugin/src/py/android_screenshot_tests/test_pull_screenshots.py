@@ -20,7 +20,7 @@ from __future__ import unicode_literals
 import unittest
 import os
 import sys
-import pull_screenshots
+from . import pull_screenshots
 import tempfile
 import shutil
 import xml.etree.ElementTree as ET
@@ -31,7 +31,7 @@ if sys.version_info >= (3,):
 else:
     from mock import *
 
-from common import assertRegex
+from .common import assertRegex
 
 TESTING_PACKAGE = 'com.foo'
 CURRENT_DIR = os.path.dirname(__file__)
