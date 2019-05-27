@@ -8,7 +8,7 @@ import subprocess
 import tempfile
 from os.path import exists, join
 
-from . import common
+import common
 
 def _check_output(args, **kwargs):
     with tempfile.TemporaryFile() as f:

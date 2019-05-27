@@ -15,7 +15,7 @@
 
 import unittest
 import os
-from . import common
+import common
 import subprocess
 import sys
 

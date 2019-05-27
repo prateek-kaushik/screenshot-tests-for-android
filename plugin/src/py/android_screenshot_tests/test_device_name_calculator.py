@@ -1,7 +1,7 @@
 import sys
 import unittest
 
-from .device_name_calculator import DeviceNameCalculator
+from device_name_calculator import DeviceNameCalculator
 
 if sys.version_info >= (3,):
     from unittest.mock import *
