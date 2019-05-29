@@ -18,7 +18,7 @@ import unittest
 import shutil
 import os
 from os.path import join, exists
-from .recorder import Recorder, VerifyError
+from recorder import Recorder, VerifyError
 
 from PIL import Image
 
@@ -63,6 +63,8 @@ class TestRecorder(unittest.TestCase):
         self.make_metadata("""<screenshots>
 <screenshot>
    <name>foobar</name>
+   <test_class>Foo</test_class>
+   <test_name>Bar</test_name>
    <tile_width>1</tile_width>
    <tile_height>1</tile_height>
 </screenshot>
@@ -76,11 +78,15 @@ class TestRecorder(unittest.TestCase):
         self.create_temp_image("bar.png", (10, 10), "red")
         self.make_metadata("""<screenshots>
 <screenshot>
+   <test_class>Foo</test_class>
+   <test_name>foo</test_name>
    <name>foo</name>
    <tile_width>1</tile_width>
    <tile_height>1</tile_height>
 </screenshot>
 <screenshot>
+   <test_class>Bar</test_class>
+   <test_name>bar</test_name>
    <name>bar</name>
    <tile_width>1</tile_width>
    <tile_height>1</tile_height>
@@ -97,6 +103,8 @@ class TestRecorder(unittest.TestCase):
 
         self.make_metadata("""<screenshots>
 <screenshot>
+   <test_class>Foo</test_class>
+   <test_name>Bar</test_name>
    <name>foobar</name>
     <tile_width>1</tile_width>
     <tile_height>2</tile_height>
@@ -120,6 +128,8 @@ class TestRecorder(unittest.TestCase):
 
         self.make_metadata("""<screenshots>
 <screenshot>
+   <test_class>Foo</test_class>
+   <test_name>Bar</test_name>
    <name>foobar</name>
     <tile_width>2</tile_width>
     <tile_height>1</tile_height>
@@ -144,6 +154,8 @@ class TestRecorder(unittest.TestCase):
 
         self.make_metadata("""<screenshots>
 <screenshot>
+   <test_class>Foo</test_class>
+   <test_name>Bar</test_name>
    <name>foobar</name>
     <tile_width>2</tile_width>
     <tile_height>2</tile_height>
@@ -164,37 +176,29 @@ class TestRecorder(unittest.TestCase):
             self.assertEqual((255, 0, 0, 255), im.getpixel((1, 11)))
 
     def test_verify_success(self):
-        self.create_temp_image("foobar.png", (10, 10), "blue")
+        self.create_temp_image("foo.png", (10, 10), "blue")
+        self.create_temp_image("bar.png", (10, 10), "red")
         self.make_metadata("""<screenshots>
-<screenshot>
-   <name>foobar</name>
-    <tile_width>1</tile_width>
-    <tile_height>1</tile_height>
-</screenshot>
-</screenshots>""")
+        <screenshot>
+           <test_class>Foo</test_class>
+           <test_name>fooo</test_name>
+           <name>foo</name>
+           <tile_width>1</tile_width>
+           <tile_height>1</tile_height>
+        </screenshot>
+        <screenshot>
+           <test_class>Bar</test_class>
+           <test_name>barr</test_name>
+           <name>bar</name>
+           <tile_width>1</tile_width>
+           <tile_height>1</tile_height>
+        </screenshot>
+        </screenshots>""")
 
         self.recorder.record()
+        self.create_temp_image("bar.png", (10, 10), "blue")
         self.recorder.verify()
 
-    def test_verify_failure(self):
-        self.create_temp_image("foobar.png", (10, 10), "blue")
-        self.make_metadata("""<screenshots>
-<screenshot>
-   <name>foobar</name>
-    <tile_width>1</tile_width>
-    <tile_height>1</tile_height>
-</screenshot>
-</screenshots>""")
-
-        self.recorder.record()
-        os.unlink(join(self.inputdir, "foobar.png"))
-        self.create_temp_image("foobar.png", (10, 10), "red")
-
-        try:
-            self.recorder.verify()
-            self.fail("expected exception")
-        except VerifyError:
-            pass  # expected
 
 if __name__ == '__main__':
     unittest.main()
