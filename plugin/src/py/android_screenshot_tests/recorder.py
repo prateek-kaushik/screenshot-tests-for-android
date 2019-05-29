@@ -105,7 +105,8 @@ class Recorder:
             is_passed = not (difference_percent > 0.05)
             if not is_passed:
                 diff_image = self.get_difference(im1, im2)
-                diff_image.save(join(self.diff_dir, name + ".png"))
+                diff_image.save(join(self.diff_dir, name))
+                diff_image.close()
             return is_passed
 
     def record(self):
@@ -118,20 +119,12 @@ class Recorder:
         if not os.path.exists(self.diff_dir):
             os.makedirs(self.diff_dir)
         self._record()
-        test_result = []
 
         root = self._get_metadata_root()
         for screenshot in root.iter("screenshot"):
             name = screenshot.find('name').text + ".png"
             actual = join(self._output, name)
             expected = join(self._realoutput, name)
-            test_class = screenshot.find('test_class').text
-            test_method = screenshot.find('test_name').text
-            is_passed = self._is_image_same(name, expected, actual)
-            test_status = ET.SubElement(screenshot, 'test_status')
-            test_status.text = str(is_passed)
-        root.write("test_result.xml")
-        shutil.rmtree(self._output)
 
     def get_difference(self, img1, img2):
         diff = ImageChops.difference(img1, img2)
