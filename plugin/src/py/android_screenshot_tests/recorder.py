@@ -125,6 +125,12 @@ class Recorder:
             name = screenshot.find('name').text + ".png"
             actual = join(self._output, name)
             expected = join(self._realoutput, name)
+            test_class = screenshot.find('test_class').text
+            test_method = screenshot.find('test_name').text
+            is_passed = self._is_image_same(name, expected, actual)
+            test_status = ET.SubElement(screenshot, 'test_status')
+            test_status.text = str(is_passed)
+        # shutil.rmtree(self._output)
 
     def get_difference(self, img1, img2):
         diff = ImageChops.difference(img1, img2)
