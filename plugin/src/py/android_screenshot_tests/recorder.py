@@ -25,7 +25,7 @@ import sys
 from os.path import join
 from PIL import Image, ImageChops
 
-import common
+from . import common
 import shutil
 import tempfile
 
@@ -103,10 +103,7 @@ class Recorder:
             ncomponents = im1.size[0] * im1.size[1] * 3
             difference_percent = (dif / 255.0 * 100) / ncomponents
             is_passed = not (difference_percent > 0.05)
-            if not is_passed:
-                diff_image = self.get_difference(im1, im2)
-                diff_image.save(join(self.diff_dir, name))
-                diff_image.close()
+
             return is_passed
 
     def record(self):
@@ -128,11 +125,16 @@ class Recorder:
             test_class = screenshot.find('test_class').text
             test_method = screenshot.find('test_name').text
             is_passed = self._is_image_same(name, expected, actual)
+            if not is_passed:
+                diff_image = self.get_difference(expected, actual)
+                diff_image.save(join(self.diff_dir, name))
+                diff_image.close()
             test_status = ET.SubElement(screenshot, 'test_status')
             test_status.text = str(is_passed)
         # shutil.rmtree(self._output)
 
     def get_difference(self, img1, img2):
-        diff = ImageChops.difference(img1, img2)
-        diff = diff.convert('L')
-        return diff
+        with Image.open(img1) as im1, Image.open(img2) as im2:
+            diff = ImageChops.difference(im1, im2)
+            diff = diff.convert('L')
+            return diff
