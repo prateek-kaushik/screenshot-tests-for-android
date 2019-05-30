@@ -131,7 +131,9 @@ class Recorder:
                 diff_image.close()
             test_status = ET.SubElement(screenshot, 'test_status')
             test_status.text = str(is_passed)
-        # shutil.rmtree(self._output)
+            file_name = ET.SubElement(screenshot, 'file_name')
+            file_name.text = name
+        root.write(join(self._output, "test_result.xml"))
 
     def get_difference(self, img1, img2):
         with Image.open(img1) as im1, Image.open(img2) as im2:
