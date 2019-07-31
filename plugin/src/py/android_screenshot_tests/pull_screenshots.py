@@ -342,10 +342,15 @@ def pull_images(dir, device_dir, adb_puller):
     root = ET.parse(join(dir, 'metadata.xml')).getroot()
     for s in root.iter('screenshot'):
         filename_nodes = s.findall('relative_file_name')
+        #TODO: copy into folders
         for filename_node in filename_nodes:
+            class_name = s.find('test_class')
+            class_path = join(dir, class_name)
+            if not os.path.exists(class_path):
+                os.makedirs(class_path)
             adb_puller.pull(
                 android_path_join(device_dir, filename_node.text),
-                join(dir, os.path.basename(filename_node.text)))
+                join(class_path, os.path.basename(filename_node.text)))
         dump_node = s.find('view_hierarchy')
         if dump_node is not None:
             adb_puller.pull(android_path_join(device_dir, dump_node.text),
