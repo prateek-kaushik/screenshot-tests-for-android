@@ -227,8 +227,9 @@ def write_image(hierarchy, dir, html, screenshot, parent_id):
         for x in range(int(screenshot.find('tile_width').text)):
             html.write('<td>')
             image_file = "./" + common.get_image_file_name(screenshot.find('name').text, x, y)
-
-            if os.path.exists(join(dir, image_file)):
+            folder = screenshot.find('test_class').test
+            img_dir = join(dir, folder)
+            if os.path.exists(join(img_dir, image_file)):
                 html.write('<img src="%s" />' % image_file)
 
             html.write('</td>')
