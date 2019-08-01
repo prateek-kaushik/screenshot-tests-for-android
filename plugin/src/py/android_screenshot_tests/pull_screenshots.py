@@ -342,9 +342,8 @@ def pull_images(dir, device_dir, adb_puller):
     root = ET.parse(join(dir, 'metadata.xml')).getroot()
     for s in root.iter('screenshot'):
         filename_nodes = s.findall('relative_file_name')
-        #TODO: copy into folders
         for filename_node in filename_nodes:
-            class_name = s.find('test_class')
+            class_name = s.find('test_class').text
             class_path = join(dir, class_name)
             if not os.path.exists(class_path):
                 os.makedirs(class_path)
