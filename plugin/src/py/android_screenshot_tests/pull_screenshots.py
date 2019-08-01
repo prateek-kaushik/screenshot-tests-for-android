@@ -230,7 +230,7 @@ def write_image(hierarchy, dir, html, screenshot, parent_id):
             folder = screenshot.find('test_class').text
             img_dir = join(dir, folder)
             if os.path.exists(join(img_dir, image_file)):
-                html.write('<img src="%s" />' % image_file)
+                html.write('<img src="%s" />' % join(img_dir, image_file))
 
             html.write('</td>')
         html.write('</tr>')
