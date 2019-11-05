@@ -51,6 +51,9 @@ open class PullScreenshotsTask : ScreenshotTask() {
     val outputDir = getReportDir(project, variant)
 
     assert(!outputDir.exists())
+    println("SNAPSHOT RUN FROM IDE")
+    println("VERIFY $verify")
+    println("VERIFY $record")
 
     project.exec {
       it.executable = "python"
