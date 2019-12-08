@@ -15,7 +15,6 @@
  */
 
 apply plugin: 'com.android.library'
-apply plugin: 'com.github.dcendents.android-maven'
 
 group = 'com.facebook.testing.screenshot'
 
@@ -33,6 +32,10 @@ android {
   }
 }
 
+afterEvaluate {
+  generateReleaseBuildConfig.enabled = false
+}
+
 dependencies {
   implementation project(':core')
   implementation deps.lithoCore
@@ -41,11 +44,4 @@ dependencies {
   androidTestImplementation deps.espresso
 }
 
-uploadArchives {
-  repositories {
-    mavenInstaller {
-    }
-  }
-}
-
-apply from: rootProject.file("release.gradle")
+apply from: rootProject.file("gradle/gradle-mvn-push.gradle")

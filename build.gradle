@@ -11,7 +11,6 @@ buildscript {
 
   dependencies {
     classpath plugs.agp
-    classpath plugs.mavenGradle
     classpath plugs.versions
   }
 }
@@ -49,20 +48,6 @@ task cleanAll(dependsOn: [
     ':plugin:clean',
     ':layout-hierarchy-common:clean',
     ':layout-hierarchy-litho:clean',
-])
-
-task installAll(dependsOn: [
-    ':core:install',
-    ':plugin:install',
-    ':layout-hierarchy-common:install',
-    ':layout-hierarchy-litho:install',
-])
-
-task uploadAllArchives(dependsOn: [
-    ':plugin:uploadArchives',
-    ':core:uploadArchives',
-    ':layout-hierarchy-common:install',
-    ':layout-hierarchy-litho:install',
 ])
 
 task integrationTest(dependsOn: ':sample:runDebugAndroidTestScreenshotTest') {

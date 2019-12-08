@@ -142,8 +142,12 @@ public class AlbumImpl implements Album {
       mZipOutputStream.close();
     }
 
-    ZipInputStream zipInputStream =
-        new ZipInputStream(new FileInputStream(new File(mDir, SCREENSHOT_BUNDLE_FILE_NAME)));
+    File bundle = new File(mDir, SCREENSHOT_BUNDLE_FILE_NAME);
+    if (!bundle.isFile()) {
+      return null;
+    }
+
+    ZipInputStream zipInputStream = new ZipInputStream(new FileInputStream(bundle));
     try {
       String filename = getScreenshotFilenameInternal(name);
       byte[] buffer = new byte[BUFFER_SIZE];
@@ -207,11 +211,24 @@ public class AlbumImpl implements Album {
     return name + "_dump.json";
   }
 
+  private static String getAxIssuesFilename(String name) {
+    return name + "_issues.json";
+  }
+
+  @Override
+  public void writeAxIssuesFile(String name, String data) throws IOException {
+    writeMetadataFile(getAxIssuesFilename(name), data);
+  }
+
   @Override
   public void writeViewHierarchyFile(String name, String data) throws IOException {
+    writeMetadataFile(getViewHierarchyFilename(name), data);
+  }
+
+  public void writeMetadataFile(String name, String data) throws IOException {
     byte[] out = data.getBytes();
 
-    ZipEntry zipEntry = new ZipEntry(getViewHierarchyFilename(name));
+    ZipEntry zipEntry = new ZipEntry(name);
     ZipOutputStream zipOutputStream = getOrCreateZipOutputStream();
     zipOutputStream.putNextEntry(zipEntry);
     zipOutputStream.write(out);
@@ -246,6 +263,7 @@ public class AlbumImpl implements Album {
     addTextNode("tile_width", String.valueOf(tiling.getWidth()));
     addTextNode("tile_height", String.valueOf(tiling.getHeight()));
     addTextNode("view_hierarchy", getViewHierarchyFilename(recordBuilder.getName()));
+    addTextNode("ax_issues", getAxIssuesFilename(recordBuilder.getName()));
 
     mXmlSerializer.startTag(null, "extras");
     for (Map.Entry<String, String> entry : recordBuilder.getExtras().entrySet()) {

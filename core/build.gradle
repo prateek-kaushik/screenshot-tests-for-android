@@ -15,7 +15,6 @@
  */
 
 apply plugin: 'com.android.library'
-apply plugin: 'com.github.dcendents.android-maven'
 
 group = 'com.facebook.testing.screenshot'
 
@@ -38,6 +37,10 @@ android {
   }
 }
 
+afterEvaluate {
+  generateReleaseBuildConfig.enabled = false
+}
+
 dependencies {
 
   compileOnly deps.jsr305
@@ -47,17 +50,11 @@ dependencies {
   androidTestImplementation deps.dexmaker
   androidTestImplementation deps.dexmakerDx
 
+  androidTestImplementation deps.androidTestRules
   androidTestImplementation deps.espresso
   androidTestImplementation deps.mockito
   androidTestImplementation deps.dexmakerMockito
   androidTestImplementation deps.hamcrest
 }
 
-uploadArchives {
-  repositories {
-    mavenInstaller {
-    }
-  }
-}
-
-apply from: rootProject.file("release.gradle")
+apply from: rootProject.file("gradle/gradle-mvn-push.gradle")

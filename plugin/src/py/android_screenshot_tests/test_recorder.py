@@ -26,15 +26,13 @@ class TestRecorder(unittest.TestCase):
     def setUp(self):
         self.outputdir = tempfile.mkdtemp()
         self.inputdir = tempfile.mkdtemp()
+        self.failureDir = tempfile.mkdtemp()
         self.tmpimages = []
-        self.recorder = Recorder(self.inputdir, self.outputdir)
+        self.recorder = Recorder(self.inputdir, self.outputdir, self.failureDir)
 
-    def create_temp_image(self, folder, name, dimens, color):
+    def create_temp_image(self, name, dimens, color):
         im = Image.new("RGBA", dimens, color)
-        filepath = os.path.join(self.inputdir, folder)
-        if not os.path.exists(filepath):
-            os.makedirs(filepath)
-        filename = os.path.join(filepath, name)
+        filename = os.path.join(self.inputdir, name)
         im.save(filename, "PNG")
         im.close()
         return filename
@@ -51,7 +49,7 @@ class TestRecorder(unittest.TestCase):
         shutil.rmtree(self.inputdir)
 
     def test_create_temp_image(self):
-        im = self.create_temp_image("","foobar", (100, 10), "blue")
+        im = self.create_temp_image("foobar", (100, 10), "blue")
         self.assertTrue(os.path.exists(im))
 
     def test_recorder_creates_dir(self):
@@ -62,34 +60,28 @@ class TestRecorder(unittest.TestCase):
         self.assertTrue(os.path.exists(self.outputdir))
 
     def test_single_input(self):
-        self.create_temp_image("Foo","foobar.png", (10, 10), "blue")
+        self.create_temp_image("foobar.png", (10, 10), "blue")
         self.make_metadata("""<screenshots>
 <screenshot>
    <name>foobar</name>
-   <test_class>Foo</test_class>
-   <test_name>Bar</test_name>
    <tile_width>1</tile_width>
    <tile_height>1</tile_height>
 </screenshot>
 </screenshots>""")
 
         self.recorder.record()
-        self.assertTrue(exists(join(join(self.outputdir, "Foo"), "Bar.png")))
+        self.assertTrue(exists(join(self.outputdir, "foobar.png")))
 
     def test_two_files(self):
-        self.create_temp_image("Foo","foo.png", (10, 10), "blue")
-        self.create_temp_image("Bar","bar.png", (10, 10), "red")
+        self.create_temp_image("foo.png", (10, 10), "blue")
+        self.create_temp_image("bar.png", (10, 10), "red")
         self.make_metadata("""<screenshots>
 <screenshot>
-   <test_class>Foo</test_class>
-   <test_name>foo</test_name>
    <name>foo</name>
    <tile_width>1</tile_width>
    <tile_height>1</tile_height>
 </screenshot>
 <screenshot>
-   <test_class>Bar</test_class>
-   <test_name>bar</test_name>
    <name>bar</name>
    <tile_width>1</tile_width>
    <tile_height>1</tile_height>
@@ -97,17 +89,15 @@ class TestRecorder(unittest.TestCase):
 </screenshots>""")
 
         self.recorder.record()
-        self.assertTrue(exists(join(join(self.outputdir, "Foo"), "foo.png")))
-        self.assertTrue(exists(join(join(self.outputdir, "Bar"), "bar.png")))
+        self.assertTrue(exists(join(self.outputdir, "foo.png")))
+        self.assertTrue(exists(join(self.outputdir, "bar.png")))
 
     def test_one_col_tiles(self):
-        self.create_temp_image("Foo","foobar.png", (10, 10), "blue")
-        self.create_temp_image("Foo","foobar_0_1.png", (10, 10), "red")
+        self.create_temp_image("foobar.png", (10, 10), "blue")
+        self.create_temp_image("foobar_0_1.png", (10, 10), "red")
 
         self.make_metadata("""<screenshots>
 <screenshot>
-   <test_class>Foo</test_class>
-   <test_name>Bar</test_name>
    <name>foobar</name>
     <tile_width>1</tile_width>
     <tile_height>2</tile_height>
@@ -116,7 +106,7 @@ class TestRecorder(unittest.TestCase):
 
         self.recorder.record()
 
-        with Image.open(join(join(self.outputdir, "Foo"), "Bar.png")) as im:
+        with Image.open(join(self.outputdir, "foobar.png")) as im:
             (w, h) = im.size
 
             self.assertEqual(10, w)
@@ -126,13 +116,11 @@ class TestRecorder(unittest.TestCase):
             self.assertEqual((255, 0, 0, 255), im.getpixel((1, 11)))
 
     def test_one_row_tiles(self):
-        self.create_temp_image("Foo","foobar.png", (10, 10), "blue")
-        self.create_temp_image("Foo","foobar_1_0.png", (10, 10), "red")
+        self.create_temp_image("foobar.png", (10, 10), "blue")
+        self.create_temp_image("foobar_1_0.png", (10, 10), "red")
 
         self.make_metadata("""<screenshots>
 <screenshot>
-   <test_class>Foo</test_class>
-   <test_name>Bar</test_name>
    <name>foobar</name>
     <tile_width>2</tile_width>
     <tile_height>1</tile_height>
@@ -141,7 +129,7 @@ class TestRecorder(unittest.TestCase):
 
         self.recorder.record()
 
-        with Image.open(join(join(self.outputdir, "Foo"), "Bar.png")) as im:
+        with Image.open(join(self.outputdir, "foobar.png")) as im:
             (w, h) = im.size
             self.assertEqual(20, w)
             self.assertEqual(10, h)
@@ -150,15 +138,13 @@ class TestRecorder(unittest.TestCase):
             self.assertEqual((255, 0, 0, 255), im.getpixel((11, 1)))
 
     def test_fractional_tiles(self):
-        self.create_temp_image("Foo","foobar.png", (10, 10), "blue")
-        self.create_temp_image("Foo","foobar_1_0.png", (9, 10), "red")
-        self.create_temp_image("Foo","foobar_0_1.png", (10, 8), "red")
-        self.create_temp_image("Foo","foobar_1_1.png", (9, 8), "blue")
+        self.create_temp_image("foobar.png", (10, 10), "blue")
+        self.create_temp_image("foobar_1_0.png", (9, 10), "red")
+        self.create_temp_image("foobar_0_1.png", (10, 8), "red")
+        self.create_temp_image("foobar_1_1.png", (9, 8), "blue")
 
         self.make_metadata("""<screenshots>
 <screenshot>
-   <test_class>Foo</test_class>
-   <test_name>Bar</test_name>
    <name>foobar</name>
     <tile_width>2</tile_width>
     <tile_height>2</tile_height>
@@ -167,7 +153,7 @@ class TestRecorder(unittest.TestCase):
 
         self.recorder.record()
 
-        with Image.open(join(join(self.outputdir, "Foo"), "Bar.png")) as im:
+        with Image.open(join(self.outputdir, "foobar.png")) as im:
             (w, h) = im.size
             self.assertEqual(19, w)
             self.assertEqual(18, h)
@@ -179,29 +165,53 @@ class TestRecorder(unittest.TestCase):
             self.assertEqual((255, 0, 0, 255), im.getpixel((1, 11)))
 
     def test_verify_success(self):
-        self.create_temp_image("Foo","foo.png", (10, 10), "blue")
-        self.create_temp_image("Bar","bar.png", (10, 10), "red")
+        self.create_temp_image("foobar.png", (10, 10), "blue")
         self.make_metadata("""<screenshots>
-        <screenshot>
-           <test_class>Foo</test_class>
-           <test_name>foo</test_name>
-           <name>foo</name>
-           <tile_width>1</tile_width>
-           <tile_height>1</tile_height>
-        </screenshot>
-        <screenshot>
-           <test_class>Bar</test_class>
-           <test_name>bar</test_name>
-           <name>bar</name>
-           <tile_width>1</tile_width>
-           <tile_height>1</tile_height>
-        </screenshot>
-        </screenshots>""")
+<screenshot>
+   <name>foobar</name>
+    <tile_width>1</tile_width>
+    <tile_height>1</tile_height>
+</screenshot>
+</screenshots>""")
 
         self.recorder.record()
-        self.create_temp_image("Bar","bar.png", (10, 10), "blue")
         self.recorder.verify()
 
+    def test_verify_failure(self):
+        self.create_temp_image("foobar.png", (10, 10), "blue")
+        self.make_metadata("""<screenshots>
+<screenshot>
+   <name>foobar</name>
+    <tile_width>1</tile_width>
+    <tile_height>1</tile_height>
+</screenshot>
+</screenshots>""")
+
+        self.recorder.record()
+        os.unlink(join(self.inputdir, "foobar.png"))
+        self.create_temp_image("foobar.png", (11, 11), "green")
+
+        try:
+            self.recorder.verify()
+            self.fail("expected exception")
+        except VerifyError:
+            pass  # expected
+
+        self.assertTrue(os.path.exists(join(self.failureDir, "foobar_actual.png")))
+        self.assertTrue(os.path.exists(join(self.failureDir, "foobar_expected.png")))
+        self.assertTrue(os.path.exists(join(self.failureDir, "foobar_diff.png")))
+
+        # check colored diff
+        with Image.open(join(self.failureDir, "foobar_diff.png")) as im:
+            (w, h) = im.size
+            self.assertEqual(11, w)
+            self.assertEqual(11, h)
+
+            self.assertEqual((255, 0, 0, 255), im.getpixel((0, 1)))
+            self.assertEqual((255, 0, 0, 255), im.getpixel((10, 1)))
+            
+            self.assertEqual((0, 128, 0, 255), im.getpixel((1, 1)))
+            self.assertEqual((0, 128, 0, 255), im.getpixel((9, 1)))
 
 if __name__ == '__main__':
     unittest.main()
