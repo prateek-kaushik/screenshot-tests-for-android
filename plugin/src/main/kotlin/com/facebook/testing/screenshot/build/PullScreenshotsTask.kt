@@ -41,19 +41,27 @@ open class PullScreenshotsTask : ScreenshotTask() {
 
   override fun init(variant: TestVariant, extension: ScreenshotsPluginExtension) {
     super.init(variant, extension)
-    apkPath = variant.outputs.find { it is ApkVariantOutput }!!.outputFile
+    val output = variant.outputs.find { it is ApkVariantOutput } as? ApkVariantOutput
+        ?: throw IllegalArgumentException("Can't find APK output")
+    val packageTask = variant.packageApplicationProvider.orNull
+        ?: throw IllegalArgumentException("Can't find package application provider")
+    
+    apkPath = File(packageTask.outputDirectory, output.outputFileName)
   }
 
   @TaskAction
   fun pullScreenshots() {
     val codeSource = ScreenshotsPlugin::class.java.protectionDomain.codeSource
     val jarFile = File(codeSource.location.toURI().path)
-    val outputDir = getReportDir(project, variant)
+    val isVerifyOnly = verify && extension.referenceDir != null
 
-    assert(!outputDir.exists())
-    println("SNAPSHOT RUN FROM IDE")
-    println("VERIFY $verify")
-    println("VERIFY $record")
+    val outputDir = if (isVerifyOnly) {
+      File(extension.referenceDir)
+    } else {
+      getReportDir(project, variant)
+    }
+
+    assert(if (isVerifyOnly) outputDir.exists() else !outputDir.exists())
 
     project.exec {
       it.executable = "python"
@@ -77,9 +85,18 @@ open class PullScreenshotsTask : ScreenshotTask() {
           add(extension.recordDir)
         }
 
+        if (verify && extension.failureDir != null) {
+            add("--failure-dir")
+            add("${extension.failureDir}")
+        }
+
         if (extension.multipleDevices) {
           add("--multiple-devices")
           add("${extension.multipleDevices}")
+        }
+
+        if (isVerifyOnly) {
+          add("--no-pull")
         }
       }
 

@@ -32,12 +32,16 @@ open class ScreenshotsPluginExtension {
   var multipleDevices = false
   /** The python executable to use */
   var pythonExecutable = "python"
+  /** The directory to compare screenshots from in verify only mode */
+  var referenceDir: String? = null
+  /** The directory to save failed screenshots */
+  var failureDir: String? = null
 }
 
 class ScreenshotsPlugin : Plugin<Project> {
   companion object {
     const val GROUP = "Screenshot Test"
-    const val DEPENDENCY_GROUP = "com.facebook.testing.screenshot"
+    const val DEPENDENCY_GROUP = "com.github.kajornsakp.screenshot"
     const val DEPENDENCY_CORE = "core"
   }
 
