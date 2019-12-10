@@ -15,7 +15,7 @@ ext {
 
   plugs = [
       agp        : "com.android.tools.build:gradle:3.5.1",
-      screenshot : "com.facebook.testing.screenshot:plugin:$screenshotTestVersion",
+      screenshot : "com.facebook.testing.screenshot:plugin:0.11.0",
       kotlin     : "org.jetbrains.kotlin:kotlin-gradle-plugin:${versions.kotlin}",
       versions   : 'com.github.ben-manes:gradle-versions-plugin:0.20.0'
   ]
@@ -36,8 +36,8 @@ ext {
 
       jsr305              : "com.google.code.findbugs:jsr305:3.0.2",
 
-      screenshotTestCommon: "com.facebook.testing.screenshot:layout-hierarchy-common:$screenshotTestVersion",
-      screenshotTestLitho : "com.facebook.testing.screenshot:layout-hierarchy-litho:$screenshotTestVersion",
+      screenshotTestCommon: "com.facebook.testing.screenshot:layout-hierarchy-common:0.11.0",
+      screenshotTestLitho : "com.facebook.testing.screenshot:layout-hierarchy-litho:0.11.0",
 
       dexmaker            : "com.crittercism.dexmaker:dexmaker:$dexmakerVersion",
       dexmakerDx          : "com.crittercism.dexmaker:dexmaker-dx:$dexmakerVersion",
