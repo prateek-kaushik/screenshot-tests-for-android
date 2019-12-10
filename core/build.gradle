@@ -28,7 +28,7 @@ android {
   defaultConfig {
     minSdkVersion versions.minSdk
     targetSdkVersion versions.targetSdk
-    testInstrumentationRunner "com.facebook.testing.screenshot.CustomScreenshotTestRunner"
+    testInstrumentationRunner "com.github.kajornsak.screenshot.CustomScreenshotTestRunner"
   }
 
   lintOptions {

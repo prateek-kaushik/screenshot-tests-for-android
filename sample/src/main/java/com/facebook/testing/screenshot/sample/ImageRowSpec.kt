@@ -6,7 +6,7 @@
  * LICENSE-examples file in the root directory of this source tree.
  */
 
-package com.facebook.testing.screenshot.sample
+package com.github.kajornsak.screenshot.sample
 
 import com.facebook.litho.Component
 import com.facebook.litho.ComponentContext

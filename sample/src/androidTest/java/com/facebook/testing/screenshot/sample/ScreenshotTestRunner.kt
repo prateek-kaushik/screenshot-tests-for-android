@@ -6,15 +6,15 @@
  * LICENSE-examples file in the root directory of this source tree.
  */
 
-package com.facebook.testing.screenshot.sample
+package com.github.kajornsak.screenshot.sample
 
 import android.os.Bundle
 import androidx.test.runner.AndroidJUnitRunner
 import com.facebook.litho.config.ComponentsConfiguration
-import com.facebook.testing.screenshot.ScreenshotRunner
-import com.facebook.testing.screenshot.layouthierarchy.LayoutHierarchyDumper
-import com.facebook.testing.screenshot.layouthierarchy.litho.LithoAttributePlugin
-import com.facebook.testing.screenshot.layouthierarchy.litho.LithoHierarchyPlugin
+import com.github.kajornsak.screenshot.ScreenshotRunner
+import com.github.kajornsak.screenshot.layouthierarchy.LayoutHierarchyDumper
+import com.github.kajornsak.screenshot.layouthierarchy.litho.LithoAttributePlugin
+import com.github.kajornsak.screenshot.layouthierarchy.litho.LithoHierarchyPlugin
 
 class ScreenshotTestRunner : AndroidJUnitRunner() {
   companion object {

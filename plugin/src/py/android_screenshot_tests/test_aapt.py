@@ -76,5 +76,5 @@ class TestAapt(unittest.TestCase):
             assertRegex(self, e.args[0], ".*Could not find build-tools.*")
 
     def test_get_package_name(self):
-        self.assertEqual('com.facebook.testing.screenshot.examples',
+        self.assertEqual('com.github.kajornsak.screenshot.examples',
                           aapt.get_package(join(CURDIR, "example.apk")))

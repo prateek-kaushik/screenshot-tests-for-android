@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.facebook.testing.screenshot.internal;
+package com.github.kajornsak.screenshot.internal;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
@@ -27,11 +27,11 @@ import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.view.View;
-import com.facebook.testing.screenshot.WindowAttachment;
-import com.facebook.testing.screenshot.layouthierarchy.AccessibilityHierarchyDumper;
-import com.facebook.testing.screenshot.layouthierarchy.AccessibilityIssuesDumper;
-import com.facebook.testing.screenshot.layouthierarchy.AccessibilityUtil;
-import com.facebook.testing.screenshot.layouthierarchy.LayoutHierarchyDumper;
+import com.github.kajornsak.screenshot.WindowAttachment;
+import com.github.kajornsak.screenshot.layouthierarchy.AccessibilityHierarchyDumper;
+import com.github.kajornsak.screenshot.layouthierarchy.AccessibilityIssuesDumper;
+import com.github.kajornsak.screenshot.layouthierarchy.AccessibilityUtil;
+import com.github.kajornsak.screenshot.layouthierarchy.LayoutHierarchyDumper;
 import java.io.IOException;
 import java.util.Locale;
 import java.util.concurrent.Callable;

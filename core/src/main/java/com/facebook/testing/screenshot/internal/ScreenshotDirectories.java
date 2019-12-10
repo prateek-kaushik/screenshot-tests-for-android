@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.facebook.testing.screenshot.internal;
+package com.github.kajornsak.screenshot.internal;
 
-import static com.facebook.testing.screenshot.ScreenshotRunner.SDCARD_DIRECTORY;
+import static com.github.kajornsak.screenshot.ScreenshotRunner.SDCARD_DIRECTORY;
 
 import android.annotation.SuppressLint;
 import android.app.UiAutomation;

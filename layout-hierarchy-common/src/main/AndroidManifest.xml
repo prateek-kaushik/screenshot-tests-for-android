@@ -13,4 +13,4 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-<manifest package="com.facebook.testing.screenshot.layouthierarchy.common"/>
+<manifest package="com.github.kajornsak.screenshot.layouthierarchy.common"/>

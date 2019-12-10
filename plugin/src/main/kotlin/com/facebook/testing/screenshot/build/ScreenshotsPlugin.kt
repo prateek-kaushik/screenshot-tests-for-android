@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.facebook.testing.screenshot.build
+package com.github.kajornsak.screenshot.build
 
-import com.facebook.testing.screenshot.generated.ScreenshotTestBuildConfig
+import com.github.kajornsak.screenshot.generated.ScreenshotTestBuildConfig
 import com.android.build.gradle.AppExtension
 import com.android.build.gradle.LibraryExtension
 import com.android.build.gradle.api.ApkVariantOutput

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.facebook.testing.screenshot.internal;
+package com.github.kajornsak.screenshot.internal;
 
 /**
  * A 2D layout of image tiles. We represent images as strings which can be looked up in an {@code

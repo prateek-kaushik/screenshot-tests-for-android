@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.facebook.testing.screenshot;
+package com.github.kajornsak.screenshot;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
@@ -24,7 +24,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 import androidx.test.InstrumentationRegistry;
-import com.facebook.testing.screenshot.test.R;
+import com.github.kajornsak.screenshot.test.R;
 import org.junit.Before;
 
 /** Tests {@link ViewHelpers} */

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.facebook.testing.screenshot.build
+package com.github.kajornsak.screenshot.build
 
 import org.gradle.api.Project
 import org.gradle.api.Task
@@ -29,7 +29,7 @@ class ScreenshotsPluginTest {
 
   @Before
   void "setup"() {
-    final appId = "com.facebook.testing.screenshot.integration"
+    final appId = "com.github.kajornsak.screenshot.integration"
     project = ProjectBuilder.builder().build()
 
     File manifest = new File(project.projectDir, "src/main/AndroidManifest.xml")

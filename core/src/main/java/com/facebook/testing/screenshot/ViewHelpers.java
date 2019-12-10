@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.facebook.testing.screenshot;
+package com.github.kajornsak.screenshot;
 
 import static android.view.View.MeasureSpec.makeMeasureSpec;
 

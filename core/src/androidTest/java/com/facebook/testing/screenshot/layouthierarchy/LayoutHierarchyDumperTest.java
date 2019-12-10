@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.facebook.testing.screenshot.layouthierarchy;
+package com.github.kajornsak.screenshot.layouthierarchy;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -27,8 +27,8 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import androidx.test.InstrumentationRegistry;
 import androidx.test.runner.AndroidJUnit4;
-import com.facebook.testing.screenshot.ViewHelpers;
-import com.facebook.testing.screenshot.test.R;
+import com.github.kajornsak.screenshot.ViewHelpers;
+import com.github.kajornsak.screenshot.test.R;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;

@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.facebook.testing.screenshot.internal;
+package com.github.kajornsak.screenshot.internal;
 
 import android.graphics.Bitmap;
 import android.view.View;
-import com.facebook.testing.screenshot.RecordBuilder;
+import com.github.kajornsak.screenshot.RecordBuilder;
 import java.io.File;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
