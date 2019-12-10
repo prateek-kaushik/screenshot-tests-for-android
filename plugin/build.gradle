@@ -20,7 +20,7 @@ repositories {
   mavenCentral()
 }
 
-final GENERATED_PACKAGE_NAME = "com.github.kajornsak.screenshot.generated"
+final GENERATED_PACKAGE_NAME = "com.facebook.testing.screenshot.generated"
 final GENERATED_BUILD_DIR =
     new File(
         projectDir.absolutePath,
@@ -55,7 +55,7 @@ dependencies {
   testImplementation deps.hamcrest
 }
 
-group = 'com.github.kajornsak.screenshot'
+group = 'com.facebook.testing.screenshot'
 
 compileKotlin {
   dependsOn generateBuildConfig

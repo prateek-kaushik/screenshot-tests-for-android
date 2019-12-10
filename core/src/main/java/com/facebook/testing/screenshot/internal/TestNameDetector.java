@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.kajornsak.screenshot.internal;
+package com.facebook.testing.screenshot.internal;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;

@@ -6,14 +6,14 @@
  * LICENSE-examples file in the root directory of this source tree.
  */
 
-package com.github.kajornsak.screenshot.sample
+package com.facebook.testing.screenshot.sample
 
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.TextView
 import androidx.test.platform.app.InstrumentationRegistry
-import com.github.kajornsak.screenshot.Screenshot
-import com.github.kajornsak.screenshot.ViewHelpers
+import com.facebook.testing.screenshot.Screenshot
+import com.facebook.testing.screenshot.ViewHelpers
 import org.junit.Test
 
 class StandardAndroidViewTest {

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.kajornsak.screenshot.internal;
+package com.facebook.testing.screenshot.internal;
 
 import static org.junit.Assert.*;
 
@@ -25,7 +25,7 @@ public class TestNameDetectorForJUnit4Test {
   public void testTestNameIsDetectedOnNonUiThread() throws Throwable {
     assertEquals("testTestNameIsDetectedOnNonUiThread", TestNameDetector.getTestName());
     assertEquals(
-        "com.github.kajornsak.screenshot.internal.TestNameDetectorForJUnit4Test",
+        "com.facebook.testing.screenshot.internal.TestNameDetectorForJUnit4Test",
         TestNameDetector.getTestClass());
   }
 

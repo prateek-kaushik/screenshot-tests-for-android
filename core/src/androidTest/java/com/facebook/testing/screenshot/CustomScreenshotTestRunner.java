@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.github.kajornsak.screenshot;
+package com.facebook.testing.screenshot;
 
 import android.os.Bundle;
 import androidx.test.runner.AndroidJUnitRunner;

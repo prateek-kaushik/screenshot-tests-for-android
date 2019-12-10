@@ -6,7 +6,7 @@
  * LICENSE-examples file in the root directory of this source tree.
  */
 
-package com.github.kajornsak.screenshot.sample
+package com.facebook.testing.screenshot.sample
 
 import com.facebook.litho.Border
 import com.facebook.litho.Column

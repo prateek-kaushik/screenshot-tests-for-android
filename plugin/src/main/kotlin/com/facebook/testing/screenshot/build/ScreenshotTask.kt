@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.kajornsak.screenshot.build
+package com.facebook.testing.screenshot.build
 
 import com.android.build.gradle.api.TestVariant
 import org.gradle.api.DefaultTask

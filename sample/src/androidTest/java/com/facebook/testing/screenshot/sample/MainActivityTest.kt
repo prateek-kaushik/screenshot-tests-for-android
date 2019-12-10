@@ -6,7 +6,7 @@
  * LICENSE-examples file in the root directory of this source tree.
  */
 
-package com.github.kajornsak.screenshot.sample
+package com.facebook.testing.screenshot.sample
 
 
 import android.view.View
@@ -16,7 +16,7 @@ import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.rule.ActivityTestRule
-import com.github.kajornsak.screenshot.Screenshot
+import com.facebook.testing.screenshot.Screenshot
 import org.hamcrest.core.AllOf.allOf
 import org.junit.Rule
 import org.junit.Test

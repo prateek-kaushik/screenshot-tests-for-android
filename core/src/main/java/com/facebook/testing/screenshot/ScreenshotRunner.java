@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.kajornsak.screenshot;
+package com.facebook.testing.screenshot;
 
 import android.app.Instrumentation;
 import android.os.Bundle;
-import com.github.kajornsak.screenshot.internal.Registry;
-import com.github.kajornsak.screenshot.internal.ScreenshotImpl;
+import com.facebook.testing.screenshot.internal.Registry;
+import com.facebook.testing.screenshot.internal.ScreenshotImpl;
 
 /**
  * The ScreenshotRunner needs to be called from the top level Instrumentation test runner before and

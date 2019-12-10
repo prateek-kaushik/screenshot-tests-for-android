@@ -13,13 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.kajornsak.screenshot.layouthierarchy.litho;
+package com.facebook.testing.screenshot.layouthierarchy.litho;
 
 import android.graphics.Point;
 import android.graphics.Rect;
 import com.facebook.litho.DebugComponent;
 import com.facebook.litho.LithoView;
-import com.github.kajornsak.screenshot.layouthierarchy.AbstractAttributePlugin;
+import com.facebook.testing.screenshot.layouthierarchy.AbstractAttributePlugin;
 import org.json.JSONException;
 import org.json.JSONObject;
 

@@ -28,17 +28,17 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
-apply plugin: 'com.github.kajornsak.screenshot'
+apply plugin: 'com.facebook.testing.screenshot'
 
 android {
   compileSdkVersion versions.compileSdk
   defaultConfig {
-    applicationId "com.github.kajornsak.screenshot.example"
+    applicationId "com.facebook.testing.screenshot.example"
     minSdkVersion 15
     targetSdkVersion versions.targetSdk
     versionCode 1
     versionName "1.0"
-    testInstrumentationRunner "com.github.kajornsak.screenshot.sample.ScreenshotTestRunner"
+    testInstrumentationRunner "com.facebook.testing.screenshot.sample.ScreenshotTestRunner"
   }
 }
 

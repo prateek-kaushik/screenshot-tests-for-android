@@ -6,14 +6,14 @@
  * LICENSE-examples file in the root directory of this source tree.
  */
 
-package com.github.kajornsak.screenshot.sample
+package com.facebook.testing.screenshot.sample
 
 
 import android.view.View
 import androidx.test.espresso.UiController
 import androidx.test.espresso.ViewAction
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
-import com.github.kajornsak.screenshot.Screenshot
+import com.facebook.testing.screenshot.Screenshot
 import org.hamcrest.Matcher
 
 fun screenshot(name: String): ViewAction {

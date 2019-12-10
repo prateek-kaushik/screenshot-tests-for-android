@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.kajornsak.screenshot.internal;
+package com.facebook.testing.screenshot.internal;
 
 import static org.junit.Assert.assertEquals;
 
@@ -27,7 +27,7 @@ public class TestNameDetectorTest {
   public void testTestNameIsDetected() throws Throwable {
     assertEquals("testTestNameIsDetected", TestNameDetector.getTestName());
     assertEquals(
-        "com.github.kajornsak.screenshot.internal.TestNameDetectorTest",
+        "com.facebook.testing.screenshot.internal.TestNameDetectorTest",
         TestNameDetector.getTestClass());
   }
 
@@ -35,7 +35,7 @@ public class TestNameDetectorTest {
   public void testTestNameIsDetectedOnNonUiThread() throws Throwable {
     assertEquals("testTestNameIsDetectedOnNonUiThread", TestNameDetector.getTestName());
     assertEquals(
-        "com.github.kajornsak.screenshot.internal.TestNameDetectorTest",
+        "com.facebook.testing.screenshot.internal.TestNameDetectorTest",
         TestNameDetector.getTestClass());
   }
 
@@ -48,7 +48,7 @@ public class TestNameDetectorTest {
   private void extraLayerMethod() {
     assertEquals("testTestNameIsDetectedThroughExtraMethod", TestNameDetector.getTestName());
     assertEquals(
-        "com.github.kajornsak.screenshot.internal.TestNameDetectorTest",
+        "com.facebook.testing.screenshot.internal.TestNameDetectorTest",
         TestNameDetector.getTestClass());
   }
 }
