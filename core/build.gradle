@@ -16,7 +16,7 @@
 
 apply plugin: 'com.android.library'
 
-group = 'com.github.kajornsakp.screenshot'
+group = 'com.facebook.testing.screenshot'
 
 android {
   compileSdkVersion versions.compileSdk

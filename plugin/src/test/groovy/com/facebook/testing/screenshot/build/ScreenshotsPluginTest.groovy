@@ -61,7 +61,7 @@ class ScreenshotsPluginTest {
 
     def depSet = project.getConfigurations().getByName('androidTestImplementation').getAllDependencies()
     for (dep in depSet) {
-      if (dep.name == "core" && dep.group == 'com.github.kajornsakp.screenshot') {
+      if (dep.name == "core" && dep.group == 'com.facebook.testing.screenshot') {
         return
       }
     }
@@ -77,7 +77,7 @@ class ScreenshotsPluginTest {
 
     def depSet = project.getConfigurations().getByName('androidTestImplementation').getAllDependencies()
     for (dep in depSet) {
-      if (dep.name == "core" && dep.group == 'com.github.kajornsakp.screenshot') {
+      if (dep.name == "core" && dep.group == 'com.facebook.testing.screenshot') {
         fail()
       }
     }
