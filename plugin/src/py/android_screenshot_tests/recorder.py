@@ -116,7 +116,7 @@ class Recorder:
                 diff_image.close()
 
     def record(self):
-        self._clean()
+        # self._clean()
         self._record()
 
     def verify(self):
