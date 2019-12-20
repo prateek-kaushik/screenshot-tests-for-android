@@ -44,30 +44,29 @@ class Recorder:
             return im.size
 
     def _copy(self, name, classname, method, w, h):
-        img_path = join(self._input, classname)
         tilewidth, tileheight = self._get_image_size(
-            join(img_path,
+            join(self._input,
                  common.get_image_file_name(name, 0, 0)))
 
         canvaswidth = 0
 
         for i  in range(w):
             input_file = common.get_image_file_name(name, i, 0)
-            canvaswidth += self._get_image_size(join(img_path, input_file))[0]
+            canvaswidth += self._get_image_size(join(self._input, input_file))[0]
 
 
         canvasheight = 0
 
         for j in range(h):
             input_file = common.get_image_file_name(name, 0, j)
-            canvasheight += self._get_image_size(join(img_path, input_file))[1]
+            canvasheight += self._get_image_size(join(self._input, input_file))[1]
 
         im = Image.new("RGBA", (canvaswidth, canvasheight))
 
         for i in range(w):
             for j in range(h):
                 input_file = common.get_image_file_name(name, i, j)
-                with Image.open(join(img_path, input_file)) as input_image:
+                with Image.open(join(self._input, input_file)) as input_image:
                     im.paste(input_image, (i * tilewidth, j * tileheight))
                     input_image.close()
 
@@ -144,7 +143,7 @@ class Recorder:
                     
                     failures.append((expected, actual))
             else:
-                if not self._is_image_same(expected, actual, None):
+                if not self._is_image_same("",expected, actual, None, None):
                     raise VerifyError("Image %s is not same as %s" % (expected, actual))                  
 
         if failures:

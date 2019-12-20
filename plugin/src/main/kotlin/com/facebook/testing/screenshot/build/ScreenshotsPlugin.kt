@@ -41,7 +41,7 @@ open class ScreenshotsPluginExtension {
 class ScreenshotsPlugin : Plugin<Project> {
   companion object {
     const val GROUP = "Screenshot Test"
-    const val DEPENDENCY_GROUP = "com.github.kajornsakp.screenshot"
+    const val DEPENDENCY_GROUP = "com.facebook.testing.screenshot"
     const val DEPENDENCY_CORE = "core"
   }
 
