@@ -108,7 +108,7 @@ class Recorder:
             difference_percent = (dif / 255.0 * 100) / ncomponents
             is_passed = not (difference_percent > 0.05)
 
-            if is_passed is None:
+            if is_passed:
                 return True
             else:
                 if failure_file:
