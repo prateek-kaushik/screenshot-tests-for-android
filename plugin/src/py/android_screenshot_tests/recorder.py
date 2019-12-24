@@ -29,8 +29,10 @@ from . import common
 import shutil
 import tempfile
 
+
 class VerifyError(Exception):
     pass
+
 
 class Recorder:
     def __init__(self, input, output, failure_output):
@@ -50,10 +52,9 @@ class Recorder:
 
         canvaswidth = 0
 
-        for i  in range(w):
+        for i in range(w):
             input_file = common.get_image_file_name(name, i, 0)
             canvaswidth += self._get_image_size(join(self._input, input_file))[0]
-
 
         canvasheight = 0
 
@@ -97,22 +98,32 @@ class Recorder:
 
     def _is_image_same(self, name, file1, file2, failure_folder, failure_file):
         with Image.open(file1) as im1, Image.open(file2) as im2:
-            diff_image = ImageChops.difference(im1, im2)
-            try:
-                diff = diff_image.getbbox()
-                if diff is None:
-                    return True
-                else:
-                    if failure_file:
-                        if not os.path.exists(failure_folder):
-                            os.makedirs(failure_folder)
+            pairs = zip(im1.getdata(), im2.getdata())
+            if len(im1.getbands()) == 1:
+                dif = sum(abs(p1 - p2) for p1, p2 in pairs)
+            else:
+                dif = sum(abs(c1 - c2) for p1, p2 in pairs for c1, c2 in zip(p1, p2))
+
+            ncomponents = im1.size[0] * im1.size[1] * 3
+            difference_percent = (dif / 255.0 * 100) / ncomponents
+            is_passed = not (difference_percent > 0.05)
+
+            if is_passed:
+                return True
+            else:
+                if failure_file:
+                    if not os.path.exists(failure_folder):
+                        os.makedirs(failure_folder)
+                    try:
+                        diff_image = ImageChops.difference(im1, im2)
+                        diff = diff_image.getbbox()
                         diff_list = list(diff) if diff else []
                         draw = ImageDraw.Draw(im2)
-                        draw.rectangle(diff_list, outline = (255,0,0))
+                        draw.rectangle(diff_list, outline=(255, 0, 0))
                         im2.save(join(failure_folder, failure_file))
-                    return False
-            finally:
-                diff_image.close()
+                    finally:
+                        diff_image.close()
+                return False
 
     def record(self):
         self._clean()
@@ -140,11 +151,11 @@ class Recorder:
 
                     shutil.copy(actual, join(diff, actual_name))
                     shutil.copy(expected, join(diff, expected_name))
-                    
+
                     failures.append((expected, actual))
             else:
-                if not self._is_image_same("",expected, actual, None, None):
-                    raise VerifyError("Image %s is not same as %s" % (expected, actual))                  
+                if not self._is_image_same("", expected, actual, None, None):
+                    raise VerifyError("Image %s is not same as %s" % (expected, actual))
 
         if failures:
             reason = ''
