@@ -32,6 +32,8 @@ open class ScreenshotsPluginExtension {
   var multipleDevices = true
   /** The python executable to use */
   var pythonExecutable = "python"
+
+  var variantRecord = false
 }
 
 class ScreenshotsPlugin : Plugin<Project> {

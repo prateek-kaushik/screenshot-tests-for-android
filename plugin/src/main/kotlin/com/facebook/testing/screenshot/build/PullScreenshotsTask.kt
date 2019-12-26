@@ -73,9 +73,16 @@ open class PullScreenshotsTask : ScreenshotTask() {
           add("--record")
         }
 
-        if (verify || record) {
-          add(extension.recordDir)
+        if (extension.variantRecord) {
+          if (verify || record) {
+            add(extension.recordDir + variant.baseName.toLowerCase() + "/")
+          }
+        } else {
+          if (verify || record) {
+            add(extension.recordDir)
+          }
         }
+
 
         if (extension.multipleDevices) {
           add("--multiple-devices")
