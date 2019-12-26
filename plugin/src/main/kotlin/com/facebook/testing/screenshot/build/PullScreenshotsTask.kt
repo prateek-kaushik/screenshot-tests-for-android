@@ -75,7 +75,7 @@ open class PullScreenshotsTask : ScreenshotTask() {
 
         if (extension.variantRecord) {
           if (verify || record) {
-            add(extension.recordDir + variant.baseName.toLowerCase() + "/")
+            add(extension.recordDir + variant.flavorName.toLowerCase() + "/")
           }
         } else {
           if (verify || record) {
