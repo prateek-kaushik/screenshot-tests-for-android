@@ -36,6 +36,8 @@ open class ScreenshotsPluginExtension {
   var referenceDir: String? = null
   /** The directory to save failed screenshots */
   var failureDir: String? = null
+  /** Using variant name as subdirectory for reference images */
+  var variantRecord = false
 }
 
 class ScreenshotsPlugin : Plugin<Project> {
