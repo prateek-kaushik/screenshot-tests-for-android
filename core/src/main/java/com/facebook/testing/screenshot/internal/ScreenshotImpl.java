@@ -1,11 +1,11 @@
 /*
- * Copyright 2014-present Facebook, Inc.
+ * Copyright (c) Facebook, Inc. and its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.facebook.testing.screenshot.internal;
 
 import android.annotation.TargetApi;
@@ -35,7 +36,6 @@ import com.facebook.testing.screenshot.layouthierarchy.LayoutHierarchyDumper;
 import java.io.IOException;
 import java.util.Locale;
 import java.util.concurrent.Callable;
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -272,18 +272,21 @@ public class ScreenshotImpl {
     try {
       JSONObject dump = new JSONObject();
       JSONObject viewDump = LayoutHierarchyDumper.create().dumpHierarchy(recordBuilder.getView());
-      AccessibilityUtil.AXTreeNode axTree =
-          AccessibilityUtil.generateAccessibilityTree(recordBuilder.getView(), null);
-      JSONObject axHierarchyDump = AccessibilityHierarchyDumper.dumpHierarchy(axTree);
       dump.put("viewHierarchy", viewDump);
-      dump.put("axHierarchy", axHierarchyDump);
       dump.put("version", METADATA_VERSION);
+
+      AccessibilityUtil.AXTreeNode axTree =
+          recordBuilder.getIncludeAccessibilityInfo()
+              ? AccessibilityUtil.generateAccessibilityTree(recordBuilder.getView(), null)
+              : null;
+      dump.put("axHierarchy", AccessibilityHierarchyDumper.dumpHierarchy(axTree));
       mAlbum.writeViewHierarchyFile(recordBuilder.getName(), dump.toString(2));
 
-      JSONObject issues = new JSONObject();
-      JSONArray axIssuesDump = AccessibilityIssuesDumper.dumpIssues(axTree);
-      issues.put("axIssues", axIssuesDump);
-      mAlbum.writeAxIssuesFile(recordBuilder.getName(), issues.toString(2));
+      if (axTree != null) {
+        JSONObject issues = new JSONObject();
+        issues.put("axIssues", AccessibilityIssuesDumper.dumpIssues(axTree));
+        mAlbum.writeAxIssuesFile(recordBuilder.getName(), issues.toString(2));
+      }
 
       mAlbum.addRecord(recordBuilder);
     } catch (IOException | JSONException e) {

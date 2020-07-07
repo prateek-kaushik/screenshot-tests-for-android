@@ -1,11 +1,11 @@
 /*
- * Copyright 2014-present Facebook, Inc.
+ * Copyright (c) Facebook, Inc. and its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.facebook.testing.screenshot.internal;
 
 import android.graphics.Bitmap;
@@ -40,6 +41,7 @@ public class RecordBuilderImpl implements RecordBuilder {
   private String mTestName;
   private String mError;
   private String mGroup;
+  private boolean mIncludeAccessibilityInfo = true;
   private Tiling mTiling = new Tiling(1, 1);
   private View mView;
   private long mMaxPixels = DEFAULT_MAX_PIXELS;
@@ -203,5 +205,16 @@ public class RecordBuilderImpl implements RecordBuilder {
   public RecordBuilderImpl setGroup(String groupName) {
     mGroup = groupName;
     return this;
+  }
+
+  /** @inherit */
+  @Override
+  public RecordBuilderImpl setIncludeAccessibilityInfo(boolean includeAccessibilityInfo) {
+    mIncludeAccessibilityInfo = includeAccessibilityInfo;
+    return this;
+  }
+
+  public boolean getIncludeAccessibilityInfo() {
+    return mIncludeAccessibilityInfo;
   }
 }
