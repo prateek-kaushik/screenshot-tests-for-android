@@ -120,8 +120,9 @@ class Recorder:
                         diff_image.close()
                 return False
 
-    def record(self):
-        self._clean()
+    def record(self, clean_record=True):
+        if clean_record:
+            self._clean()
         self._record()
 
     def verify(self):
