@@ -48,7 +48,7 @@ open class PullScreenshotsTask : ScreenshotTask() {
     val packageTask = variant.packageApplicationProvider.orNull
         ?: throw IllegalArgumentException("Can't find package application provider")
     
-    apkPath = File(packageTask.outputDirectory.asFile.get(), output.outputFileName)
+    apkPath = File(packageTask.outputDirectory, output.outputFileName)
   }
 
   @TaskAction
