@@ -34,6 +34,7 @@ open class PullScreenshotsTask : ScreenshotTask() {
   private lateinit var apkPath: File
   protected var verify = false
   protected var record = false
+  protected var keepOldRecord = false
 
   init {
     description = "Pull screenshots from your device"
@@ -47,7 +48,7 @@ open class PullScreenshotsTask : ScreenshotTask() {
     val packageTask = variant.packageApplicationProvider.orNull
         ?: throw IllegalArgumentException("Can't find package application provider")
     
-    apkPath = File(packageTask.outputDirectory.asFile.get(), output.outputFileName)
+    apkPath = File(packageTask.outputDirectory, output.outputFileName)
   }
 
   @TaskAction
@@ -104,6 +105,10 @@ open class PullScreenshotsTask : ScreenshotTask() {
 
         if (isVerifyOnly) {
           add("--no-pull")
+        }
+
+        if(keepOldRecord) {
+          add("--keep-old-record")
         }
       }
 

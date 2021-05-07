@@ -105,6 +105,12 @@ class ScreenshotsPlugin : Plugin<Project> {
 
         createTask(
             project,
+            SingleRecordScreenshotTestTask.taskName(variant),
+            variant,
+            SingleRecordScreenshotTestTask::class.java)
+
+        createTask(
+            project,
             VerifyScreenshotTestTask.taskName(variant),
             variant,
             VerifyScreenshotTestTask::class.java)
