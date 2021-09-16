@@ -27,18 +27,16 @@ import com.facebook.yoga.YogaEdge
 
 @LayoutSpec
 object ExampleSpec {
-  @OnCreateLayout
-  fun onCreateLayout(c: ComponentContext): Component =
-      Column.create(c)
-          .child(ImageRow.create(c))
-          .child(
-              Text.create(c)
-                  .textRes(R.string.large_text))
-          .paddingDip(YogaEdge.ALL, 16f)
-          .border(
-              Border.create(c)
-                  .colorRes(YogaEdge.ALL, R.color.colorPrimary)
-                  .widthDip(YogaEdge.ALL, 8f)
-                  .build())
-          .build()
+    @OnCreateLayout
+    fun onCreateLayout(c: ComponentContext): Component =
+        Column.create(c)
+            .child(ImageRow.create(c))
+            .child(Text.create(c).textRes(R.string.large_text))
+            .paddingDip(YogaEdge.ALL, 16f)
+            .border(
+                Border.create(c)
+                    .colorRes(YogaEdge.ALL, R.color.colorPrimary)
+                    .widthDip(YogaEdge.ALL, 8f)
+                    .build())
+            .build()
 }

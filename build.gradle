@@ -19,21 +19,25 @@ apply plugin: 'com.github.ben-manes.versions'
 buildscript {
   apply from: rootProject.file('versions.gradle')
   repositories {
-    jcenter()
+    mavenCentral()
     google()
+    jcenter()
   }
 
   dependencies {
     classpath plugs.agp
     classpath plugs.versions
+    classpath plugs.publish
+    classpath plugs.dokka
   }
 }
 
 allprojects {
   version = property('VERSION_NAME')
   repositories {
-    jcenter()
+    mavenCentral()
     google()
+    jcenter()
   }
 }
 
@@ -58,14 +62,14 @@ gradle.addListener(new TaskExecutionListener() {
 })
 
 task cleanAll(dependsOn: [
-    ':core:clean',
-    ':plugin:clean',
-    ':layout-hierarchy-common:clean',
-    ':layout-hierarchy-litho:clean',
+        ':core:clean',
+        ':plugin:clean',
+        ':layout-hierarchy-common:clean',
+        ':layout-hierarchy-litho:clean',
 ])
 
 task integrationTest(dependsOn: ':sample:runDebugAndroidTestScreenshotTest') {
   doLast {
-    assert taskLogOutput.toString().contains('Found 11 screenshots')
+    assert taskLogOutput.toString().contains('Found 12 screenshots')
   }
 }

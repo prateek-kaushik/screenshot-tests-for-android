@@ -126,12 +126,12 @@ public class ScreenshotImpl {
   public RecordBuilderImpl snapActivity(final Activity activity) {
     if (!isUiThread()) {
       return runCallableOnUiThread(
-              new Callable<RecordBuilderImpl>() {
-                @Override
-                public RecordBuilderImpl call() {
-                  return snapActivity(activity);
-                }
-              })
+          new Callable<RecordBuilderImpl>() {
+            @Override
+            public RecordBuilderImpl call() {
+              return snapActivity(activity);
+            }
+          })
           .setTestClass(TestNameDetector.getTestClass())
           .setTestName(TestNameDetector.getTestName());
     }

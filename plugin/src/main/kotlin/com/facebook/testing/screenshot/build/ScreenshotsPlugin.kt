@@ -19,10 +19,14 @@ package com.facebook.testing.screenshot.build
 import com.facebook.testing.screenshot.generated.ScreenshotTestBuildConfig
 import com.android.build.gradle.AppExtension
 import com.android.build.gradle.LibraryExtension
+import com.android.build.gradle.TestedExtension
 import com.android.build.gradle.api.ApkVariantOutput
 import com.android.build.gradle.api.TestVariant
+import com.android.build.gradle.internal.tasks.factory.dependsOn
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.tasks.TaskProvider
+import java.util.*
 
 open class ScreenshotsPluginExtension {
   /** The directory to store recorded screenshots in */
@@ -39,6 +43,8 @@ open class ScreenshotsPluginExtension {
   var failureDir: String? = null
   /** Using variant name as subdirectory for reference images */
   var variantRecord = false
+
+  var testRunId: String = UUID.randomUUID().toString()
 }
 
 class ScreenshotsPlugin : Plugin<Project> {
@@ -61,55 +67,68 @@ class ScreenshotsPlugin : Plugin<Project> {
       }
     }
 
-    val variants = when {
-      plugins.hasPlugin("com.android.application") ->
-        extensions.findByType(AppExtension::class.java)!!.testVariants
-      plugins.hasPlugin("com.android.library") ->
-        extensions.findByType(LibraryExtension::class.java)!!.testVariants
-      else -> throw IllegalArgumentException("Screenshot Test plugin requires Android's plugin")
-    }
-
-    variants.all { generateTasksFor(project, it) }
+    val androidExtension = getProjectExtension(project)
+    androidExtension.testVariants.all { generateTasksFor(project, it) }
+    androidExtension.defaultConfig.testInstrumentationRunnerArguments["SCREENSHOT_TESTS_RUN_ID"] =
+      screenshotExtensions.testRunId
   }
 
-  private fun <T : ScreenshotTask> createTask(
-      project: Project, name: String, variant: TestVariant, clazz: Class<T>): T {
-    return project.tasks.create(name, clazz).apply { init(variant, screenshotExtensions) }
+  private fun getProjectExtension(project: Project): TestedExtension {
+    val extensions = project.extensions
+    val plugins = project.plugins
+    return when {
+      plugins.hasPlugin("com.android.application") ->
+        extensions.findByType(AppExtension::class.java)!!
+      plugins.hasPlugin("com.android.library") ->
+        extensions.findByType(LibraryExtension::class.java)!!
+      else -> throw IllegalArgumentException("Screenshot Test plugin requires Android's plugin")
+    }
+  }
+
+  private fun <T : ScreenshotTask> registerTask(
+    project: Project,
+    name: String,
+    variant: TestVariant,
+    clazz: Class<T>
+  ): TaskProvider<T> {
+    return project.tasks.register(name, clazz).apply {
+      configure { it.init(variant, screenshotExtensions) }
+    }
   }
 
   private fun generateTasksFor(project: Project, variant: TestVariant) {
     variant.outputs.all {
       if (it is ApkVariantOutput) {
-        val cleanScreenshots = createTask(
+        val cleanScreenshots = registerTask(
             project,
             CleanScreenshotsTask.taskName(variant),
             variant,
             CleanScreenshotsTask::class.java)
-        createTask(
+        registerTask(
             project,
             PullScreenshotsTask.taskName(variant),
             variant,
             PullScreenshotsTask::class.java).dependsOn(cleanScreenshots)
 
-        createTask(
+        registerTask(
             project,
             RunScreenshotTestTask.taskName(variant),
             variant,
             RunScreenshotTestTask::class.java)
 
-        createTask(
+        registerTask(
             project,
             RecordScreenshotTestTask.taskName(variant),
             variant,
             RecordScreenshotTestTask::class.java)
 
-        createTask(
+        registerTask(
             project,
             SingleRecordScreenshotTestTask.taskName(variant),
             variant,
             SingleRecordScreenshotTestTask::class.java)
 
-        createTask(
+        registerTask(
             project,
             VerifyScreenshotTestTask.taskName(variant),
             variant,

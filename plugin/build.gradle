@@ -16,23 +16,22 @@
 
 buildscript {
   repositories {
-    jcenter()
+    mavenCentral()
     google()
     mavenLocal()
+    jcenter()
   }
   dependencies {
     classpath plugs.kotlin
+    classpath plugs.publish
+    classpath plugs.dokka
   }
 }
 
 apply plugin: 'groovy'
 apply plugin: 'kotlin'
 apply plugin: "java-gradle-plugin"
-
-repositories {
-  jcenter()
-  mavenCentral()
-}
+apply plugin: 'com.vanniktech.maven.publish'
 
 final GENERATED_PACKAGE_NAME = "com.facebook.testing.screenshot.generated"
 final GENERATED_BUILD_DIR =
@@ -61,7 +60,6 @@ task generateBuildConfig {
 dependencies {
   implementation deps.kotlinStdlib
   compileOnly plugs.agp
-
 
   testImplementation deps.junit
   testImplementation plugs.agp
@@ -106,6 +104,3 @@ task py3Tests(type: Exec) {
   workingDir file('./src/py')
   commandLine 'python3', '-m', 'unittest', 'discover'
 }
-
-
-apply from: rootProject.file("gradle/gradle-mvn-push.gradle")

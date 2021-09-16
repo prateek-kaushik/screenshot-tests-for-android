@@ -18,23 +18,33 @@ package com.facebook.testing.screenshot.build
 
 import com.android.build.gradle.api.ApkVariantOutput
 import com.android.build.gradle.api.TestVariant
-import org.gradle.api.tasks.TaskAction
 import org.gradle.api.Project
+import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.TaskAction
 import java.io.File
 
 
 open class PullScreenshotsTask : ScreenshotTask() {
   companion object {
-      fun taskName(variant: TestVariant) = "pull${variant.name.capitalize()}Screenshots"
+    fun taskName(variant: TestVariant) = "pull${variant.name.capitalize()}Screenshots"
 
-      fun getReportDir(project: Project, variant: TestVariant): File =
-          File(project.buildDir, "screenshots" + variant.name.capitalize())
+    fun getReportDir(project: Project, variant: TestVariant): File =
+      File(project.buildDir, "screenshots" + variant.name.capitalize())
   }
 
   private lateinit var apkPath: File
+
+  @Input
   protected var verify = false
+
+  @Input
   protected var record = false
+
+  @Input
   protected var keepOldRecord = false
+
+  @Input
+  protected lateinit var testRunId: String
 
   init {
     description = "Pull screenshots from your device"
@@ -44,10 +54,10 @@ open class PullScreenshotsTask : ScreenshotTask() {
   override fun init(variant: TestVariant, extension: ScreenshotsPluginExtension) {
     super.init(variant, extension)
     val output = variant.outputs.find { it is ApkVariantOutput } as? ApkVariantOutput
-        ?: throw IllegalArgumentException("Can't find APK output")
+      ?: throw IllegalArgumentException("Can't find APK output")
     val packageTask = variant.packageApplicationProvider.orNull
-        ?: throw IllegalArgumentException("Can't find package application provider")
-    
+      ?: throw IllegalArgumentException("Can't find package application provider")
+
     apkPath = File(packageTask.outputDirectory, output.outputFileName)
   }
 
@@ -57,11 +67,12 @@ open class PullScreenshotsTask : ScreenshotTask() {
     val jarFile = File(codeSource.location.toURI().path)
     val isVerifyOnly = verify && extension.referenceDir != null
 
-    val outputDir = if (isVerifyOnly) {
-      File(extension.referenceDir)
-    } else {
-      getReportDir(project, variant)
-    }
+    val outputDir =
+      if (isVerifyOnly) {
+        File(extension.referenceDir)
+      } else {
+        getReportDir(project, variant)
+      }
 
     assert(if (isVerifyOnly) outputDir.exists() else !outputDir.exists())
 
@@ -94,8 +105,8 @@ open class PullScreenshotsTask : ScreenshotTask() {
         }
 
         if (verify && extension.failureDir != null) {
-            add("--failure-dir")
-            add("${extension.failureDir}")
+          add("--failure-dir")
+          add("${extension.failureDir}")
         }
 
         if (extension.multipleDevices) {
@@ -107,7 +118,7 @@ open class PullScreenshotsTask : ScreenshotTask() {
           add("--no-pull")
         }
 
-        if(keepOldRecord) {
+        if (keepOldRecord) {
           add("--keep-old-record")
         }
       }

@@ -26,26 +26,26 @@ import com.facebook.yoga.YogaEdge
 
 @LayoutSpec
 object ImageRowSpec {
-  @OnCreateLayout
-  fun onCreateLayout(c: ComponentContext): Component =
-      Row.create(c)
-          .child(
-              Image.create(c)
-                  .drawableRes(R.drawable.ic_launcher_background)
-                  .widthDip(64f)
-                  .heightDip(64f)
-                  .paddingDip(YogaEdge.ALL, 4f))
-          .child(
-              Image.create(c)
-                  .drawableRes(R.drawable.ic_launcher_background)
-                  .widthDip(128f)
-                  .heightDip(128f)
-                  .paddingDip(YogaEdge.ALL, 4f))
-          .child(
-              Image.create(c)
-                  .drawableRes(R.drawable.ic_launcher_background)
-                  .widthDip(32f)
-                  .heightDip(32f)
-                  .paddingDip(YogaEdge.ALL, 4f))
-          .build()
+    @OnCreateLayout
+    fun onCreateLayout(c: ComponentContext): Component =
+        Row.create(c)
+            .child(
+                Image.create(c)
+                    .drawableRes(R.drawable.ic_launcher_background)
+                    .widthDip(64f)
+                    .heightDip(64f)
+                    .paddingDip(YogaEdge.ALL, 4f))
+            .child(
+                Image.create(c)
+                    .drawableRes(R.drawable.ic_launcher_background)
+                    .widthDip(128f)
+                    .heightDip(128f)
+                    .paddingDip(YogaEdge.ALL, 4f))
+            .child(
+                Image.create(c)
+                    .drawableRes(R.drawable.ic_launcher_background)
+                    .widthDip(32f)
+                    .heightDip(32f)
+                    .paddingDip(YogaEdge.ALL, 4f))
+            .build()
 }
