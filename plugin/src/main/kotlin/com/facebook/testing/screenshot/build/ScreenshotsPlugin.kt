@@ -16,7 +16,6 @@
 
 package com.facebook.testing.screenshot.build
 
-import com.facebook.testing.screenshot.generated.ScreenshotTestBuildConfig
 import com.android.build.gradle.AppExtension
 import com.android.build.gradle.LibraryExtension
 import com.android.build.gradle.api.ApkVariantOutput
@@ -57,7 +56,7 @@ class ScreenshotsPlugin : Plugin<Project> {
 
     project.afterEvaluate {
       if (screenshotExtensions.addDeps) {
-        it.dependencies.add("androidTestImplementation", "$DEPENDENCY_GROUP:$DEPENDENCY_CORE:${ScreenshotTestBuildConfig.VERSION}")
+        it.dependencies.add("androidTestImplementation", "$DEPENDENCY_GROUP:$DEPENDENCY_CORE:0.14.0")
       }
     }
 
