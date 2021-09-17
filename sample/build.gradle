@@ -41,12 +41,12 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
-apply plugin: 'com.facebook.testing.screenshot'
+apply plugin: 'com.agoda.testing.screenshot'
 
 android {
   compileSdkVersion versions.compileSdk
   defaultConfig {
-    applicationId "com.facebook.testing.screenshot.example"
+    applicationId "com.agoda.testing.screenshot.example"
     minSdkVersion 15
     targetSdkVersion versions.targetSdk
     versionCode 1

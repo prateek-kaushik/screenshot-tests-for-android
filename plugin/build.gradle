@@ -16,9 +16,8 @@
 
 buildscript {
   repositories {
-    jcenter()
     google()
-    mavenLocal()
+    mavenCentral()
   }
   dependencies {
     classpath plugs.kotlin
@@ -30,7 +29,7 @@ apply plugin: 'kotlin'
 apply plugin: "java-gradle-plugin"
 
 repositories {
-  jcenter()
+  google()
   mavenCentral()
 }
 
@@ -107,5 +106,3 @@ task py3Tests(type: Exec) {
   commandLine 'python3', '-m', 'unittest', 'discover'
 }
 
-
-apply from: rootProject.file("gradle/gradle-mvn-push.gradle")
