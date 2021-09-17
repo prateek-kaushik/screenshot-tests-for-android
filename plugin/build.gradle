@@ -27,17 +27,13 @@ buildscript {
 apply plugin: 'groovy'
 apply plugin: 'kotlin'
 apply plugin: "java-gradle-plugin"
-
-repositories {
-  google()
-  mavenCentral()
-}
+apply plugin: "maven-publish"
 
 final GENERATED_PACKAGE_NAME = "com.facebook.testing.screenshot.generated"
 final GENERATED_BUILD_DIR =
-    new File(
-        projectDir.absolutePath,
-        "src/generated/kotlin/${GENERATED_PACKAGE_NAME.replace('.', '/')}")
+        new File(
+                projectDir.absolutePath,
+                "src/generated/kotlin/${GENERATED_PACKAGE_NAME.replace('.', '/')}")
 
 task generateBuildConfig {
   doLast {
@@ -61,22 +57,10 @@ dependencies {
   implementation deps.kotlinStdlib
   compileOnly plugs.agp
 
-
   testImplementation deps.junit
   testImplementation plugs.agp
   testImplementation deps.mockito
   testImplementation deps.hamcrest
-}
-
-group = 'com.facebook.testing.screenshot'
-
-compileKotlin {
-  dependsOn generateBuildConfig
-  sourceSets {
-    main {
-      kotlin.srcDirs += 'src/generated'
-    }
-  }
 }
 
 compileJava {
@@ -105,4 +89,5 @@ task py3Tests(type: Exec) {
   workingDir file('./src/py')
   commandLine 'python3', '-m', 'unittest', 'discover'
 }
+
 
