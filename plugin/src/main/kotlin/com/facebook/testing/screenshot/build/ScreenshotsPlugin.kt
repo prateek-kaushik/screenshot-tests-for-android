@@ -56,7 +56,7 @@ class ScreenshotsPlugin : Plugin<Project> {
 
     project.afterEvaluate {
       if (screenshotExtensions.addDeps) {
-        it.dependencies.add("androidTestImplementation", "$DEPENDENCY_GROUP:$DEPENDENCY_CORE:0.14.0")
+        it.dependencies.add("androidTestImplementation", "$DEPENDENCY_GROUP:$DEPENDENCY_CORE:0.11.0")
       }
     }
 
