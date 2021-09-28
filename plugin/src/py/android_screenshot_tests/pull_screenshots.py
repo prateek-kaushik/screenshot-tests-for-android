@@ -1,18 +1,3 @@
-#!/usr/bin/env python
-# Copyright (c) Facebook, Inc. and its affiliates.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
@@ -534,6 +519,7 @@ def pull_screenshots(process,
                      temp_dir=None,
                      filter_name_regex=None,
                      record=None,
+                     keep_old_record=None,
                      verify=None,
                      opt_generate_png=None,
                      test_img_api=None,
@@ -573,7 +559,7 @@ def pull_screenshots(process,
         if verify:
             recorder.verify()
         else:
-            recorder.record()
+            recorder.record(keep_old_record is None)
 
     if opt_generate_png:
         generate_png(path_to_html, opt_generate_png)
@@ -597,8 +583,8 @@ def main(argv):
         opt_list, rest_args = getopt.gnu_getopt(
             argv[1:],
             "eds:",
-            ["generate-png=", "filter-name-regex=", "apk", "record=", "verify=", "failure-dir=", "temp-dir=",
-             "no-pull", "multiple-devices="])
+            ["generate-png=", "filter-name-regex=", "apk", "record=", "verify=", "failure-dir=",
+             "temp-dir=", "no-pull", "multiple-devices=", "keep-old-record"])
     except getopt.GetoptError:
         usage()
         return 2
@@ -646,6 +632,7 @@ def main(argv):
                          filter_name_regex=opts.get('--filter-name-regex'),
                          opt_generate_png=opts.get('--generate-png'),
                          record=opts.get('--record'),
+                         keep_old_record=opts.get('--keep-old-record'),
                          verify=opts.get('--verify'),
                          adb_puller=SimplePuller(puller_args),
                          device_name_calculator=device_calculator,

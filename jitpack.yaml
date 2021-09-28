@@ -1,0 +1,3 @@
+install:
+  - ./gradlew build :plugin:publishToMavenLocal
+  - find . -name "*.aar"
