@@ -1,19 +1,17 @@
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-from __future__ import unicode_literals
+#!/usr/bin/env python3
 
 import codecs
 import getopt
 import json
-import os
 import shutil
-import subprocess
+import subprocess, os, platform
 import sys
 import tempfile
 import urllib
 import xml.etree.ElementTree as ET
 import zipfile
+from os.path import abspath
+from os.path import join
 
 from . import aapt
 from . import common
@@ -22,77 +20,79 @@ from .device_name_calculator import DeviceNameCalculator
 from .no_op_device_name_calculator import NoOpDeviceNameCalculator
 from .simple_puller import SimplePuller
 
-from os.path import join
-from os.path import abspath
-
 try:
     from Queue import Queue
 except ImportError:
     from queue import Queue
 
 
-OLD_ROOT_SCREENSHOT_DIR = '/data/data/'
-KEY_VIEW_HIERARCHY = 'viewHierarchy'
-KEY_AX_HIERARCHY = 'axHierarchy'
-KEY_CLASS = 'class'
-KEY_LEFT = 'left'
-KEY_TOP = 'top'
-KEY_WIDTH = 'width'
-KEY_HEIGHT = 'height'
-KEY_CHILDREN = 'children'
-DEFAULT_VIEW_CLASS = 'android.view.View'
+OLD_ROOT_SCREENSHOT_DIR = "/data/data/"
+KEY_VIEW_HIERARCHY = "viewHierarchy"
+KEY_AX_HIERARCHY = "axHierarchy"
+KEY_CLASS = "class"
+KEY_LEFT = "left"
+KEY_TOP = "top"
+KEY_WIDTH = "width"
+KEY_HEIGHT = "height"
+KEY_CHILDREN = "children"
+DEFAULT_VIEW_CLASS = "android.view.View"
 
 
 def usage():
-    print("usage: ./scripts/screenshot_tests/pull_screenshots com.facebook.apk.name.tests [--generate-png]", file=sys.stderr)
+    print(
+        "usage: ./scripts/screenshot_tests/pull_screenshots com.facebook.apk.name.tests [--generate-png]",
+        file=sys.stderr,
+    )
     return
 
 
 def sort_screenshots(screenshots):
     def sort_key(screenshot):
-        group = screenshot.find('group')
+        group = screenshot.get("group")
 
-        group = group.text if group is not None else ""
+        group = group if group is not None else ""
 
-        return (group, screenshot.find('name').text)
+        return (group, screenshot["name"])
 
-    return sorted(list(screenshots), key=sort_key)
+    return sorted(screenshots, key=sort_key)
 
 
 def show_old_result(
-    test_name,
-    html,
-    new_screenshot,
-    test_img_api,
-    old_imgs_data,
+        test_name,
+        html,
+        new_screenshot,
+        test_img_api,
+        old_imgs_data,
 ):
     try:
-        old_screenshot_url = get_old_screenshot_url(test_name, test_img_api, old_imgs_data)
+        old_screenshot_url = get_old_screenshot_url(
+            test_name, test_img_api, old_imgs_data
+        )
         html.write('<div class="img-block">Current')
         html.write('<div class="img-wrapper">')
         html.write('<img src="%s"></img>' % old_screenshot_url)
-        html.write('</div>')
-        html.write('</div>')
+        html.write("</div>")
+        html.write("</div>")
     except Exception:
         # Do nothing
         pass
 
 
 def get_old_screenshot_url(test_name, test_img_api, old_imgs_data):
-    old_imgs_data['test'] = test_name
+    old_imgs_data["test"] = test_name
     encoded_data = urllib.urlencode(old_imgs_data)
     url = test_img_api + encoded_data
-    response = json.loads(urllib.urlopen(url).read().decode('utf-8'))
-    if 'error' in response:
+    response = json.loads(urllib.urlopen(url).read().decode())
+    if "error" in response:
         raise Exception
-    return response['url']
+    return response["url"]
 
 
 def generate_html(
-    output_dir,
-    test_img_api=None,
-    old_imgs_data=None,
-    diff=False,
+        output_dir,
+        test_img_api=None,
+        old_imgs_data=None,
+        diff=False,
 ):
     # Take in:
     # output_dir a directory with imgs and data outputted by the just-run test,
@@ -100,62 +100,70 @@ def generate_html(
     #   and returns a url to an image from a previous run of the test,
     # old_imgs_data a dict that will be used in the test_img_api url.
     # Creates the html for showing a before and after comparison of the images.
-    output_root = ET.parse(join(output_dir, 'metadata.xml')).getroot()
+    with open(join(output_dir, "metadata.json")) as m:
+        screenshots = json.load(m)
     alternate = False
     index_html = abspath(join(output_dir, "index.html"))
     with codecs.open(index_html, mode="w", encoding="utf-8") as html:
-        html.write('<!DOCTYPE html>')
-        html.write('<html>')
-        html.write('<head>')
-        html.write('<title>Screenshot Test Results</title>')
+        html.write("<!DOCTYPE html>")
+        html.write("<html>")
+        html.write("<head>")
+        html.write("<title>Screenshot Test Results</title>")
         html.write(
-            '<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>')
+            '<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>'
+        )
         html.write(
-            '<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.3/jquery-ui.min.js"></script>')
+            '<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.3/jquery-ui.min.js"></script>'
+        )
         html.write('<script src="default.js"></script>')
         html.write(
-            '<link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.3/themes/smoothness/jquery-ui.css" />')
+            '<link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.3/themes/smoothness/jquery-ui.css" />'
+        )
         html.write('<link rel="stylesheet" href="default.css"></head>')
-        html.write('<body>')
+        html.write("<body>")
 
         screenshot_num = 0
-        for screenshot in sort_screenshots(output_root.iter('screenshot')):
+        for screenshot in sort_screenshots(screenshots):
             screenshot_num += 1
             alternate = not alternate
-            canonical_name = screenshot.find('name').text
+            canonical_name = screenshot["name"]
             package = ""
             name = canonical_name
-            if '.' in canonical_name:
-                last_seperator = canonical_name.rindex('.') + 1
+            if "." in canonical_name:
+                last_seperator = canonical_name.rindex(".") + 1
                 package = canonical_name[:last_seperator]
                 name = canonical_name[last_seperator:]
 
-            html.write('<div class="screenshot %s">' % ('alternate' if alternate else ''))
+            html.write(
+                '<div class="screenshot %s">' % ("alternate" if alternate else "")
+            )
             html.write('<div class="screenshot_name">')
             html.write('<span class="demphasize">%s</span>%s' % (package, name))
-            html.write('</div>')
+            html.write("</div>")
 
-            group = screenshot.find('group')
+            group = screenshot.get("group")
             if group:
-                html.write('<div class="screenshot_group">%s</div>' % group.text)
+                html.write('<div class="screenshot_group">%s</div>' % group)
 
-            extras = screenshot.find('extras')
+            extras = screenshot.get("extras")
             if extras is not None:
                 str = ""
-                for node in extras:
-                    if node.text is not None:
-                        str = str + "*****" + node.tag + "*****\n\n" + node.text + "\n\n\n"
+                for key, value in extras:
+                    if key is not None:
+                        str = str + "*****" + key + "*****\n\n" + value + "\n\n\n"
                 if str != "":
-                    extra_html = '<button class="extra" data="%s">Extra info</button>' % str
-                    html.write(extra_html.encode('utf-8').strip())
+                    extra_html = (
+                            '<button class="extra" data="%s">Extra info</button>' % str
+                    )
+                    html.write(extra_html.encode("utf-8").strip())
 
-            description = screenshot.find('description')
+            description = screenshot.get("description")
             if description is not None:
-                html.write('<div class="screenshot_description">%s</div>' % description.text)
+                html.write('<div class="screenshot_description">%s</div>' % description)
 
-            error = screenshot.find('error')
+            error = screenshot.get("error")
             if error is not None:
-                html.write('<div class="screenshot_error">%s</div>' % error.text)
+                html.write('<div class="screenshot_error">%s</div>' % error)
             else:
                 hierarchy_data = get_view_hierarchy(output_dir, screenshot)
                 if hierarchy_data and KEY_VIEW_HIERARCHY in hierarchy_data:
@@ -185,12 +193,11 @@ def generate_html(
                 )
                 if comparing and diff:
                     try:
-                        old_screenshot_url = get_old_screenshot_url(canonical_name, test_img_api, old_imgs_data)
+                        old_screenshot_url = get_old_screenshot_url(
+                            canonical_name, test_img_api, old_imgs_data
+                        )
                         write_image_diff(
-                            old_screenshot_url,
-                            output_dir,
-                            html,
-                            screenshot
+                            old_screenshot_url, output_dir, html, screenshot
                         )
                     except Exception:
                         # Do nothing
@@ -199,60 +206,65 @@ def generate_html(
                 write_commands(html)
                 write_view_hierarchy(hierarchy, html, screenshot_num)
                 write_ax_hierarchy(ax_hierarchy, html, screenshot_num)
-                html.write('</div>')
-                html.write('</div>')
+                html.write("</div>")
+                html.write("</div>")
 
-            html.write('</div>')
+            html.write("</div>")
             html.write('<div class="clearfix"></div>')
-            html.write('<hr/>')
+            html.write("<hr/>")
 
-        html.write('</body></html>')
+        html.write("</body></html>")
         return index_html
 
 
 def write_commands(html):
     html.write('<button class="toggle_dark">Toggle Dark Background</button>')
-    html.write('<button class="toggle_hierarchy">Toggle View Hierarchy Overlay</button>')
+    html.write(
+        '<button class="toggle_hierarchy">Toggle View Hierarchy Overlay</button>'
+    )
 
 
 def write_view_hierarchy(hierarchy, html, parent_id):
     if not hierarchy:
         return
 
-    html.write('<h3>View Hierarchy</h3>')
+    html.write("<h3>View Hierarchy</h3>")
     html.write('<div class="view-hierarchy">')
     write_view_hierarchy_tree_node(hierarchy, html, parent_id, True)
-    html.write('</div>')
+    html.write("</div>")
 
 
 def write_ax_hierarchy(hierarchy, html, parent_id):
     if not hierarchy:
         return
 
-    html.write('<h3>Accessibility Hierarchy</h3>')
+    html.write("<h3>Accessibility Hierarchy</h3>")
     html.write('<div class="view-hierarchy">')
     write_view_hierarchy_tree_node(hierarchy, html, parent_id, False)
-    html.write('</div>')
+    html.write("</div>")
 
 
 def write_view_hierarchy_tree_node(node, html, parent_id, with_overlay_target):
     if with_overlay_target:
-        html.write('<details target="#%s-%s">' % (parent_id, get_view_hierarchy_overlay_node_id(node)))
+        html.write(
+            '<details target="#%s-%s">'
+            % (parent_id, get_view_hierarchy_overlay_node_id(node))
+        )
     else:
-        html.write('<details>')
-    html.write('<summary>%s</summary>' % node.get(KEY_CLASS, DEFAULT_VIEW_CLASS))
-    html.write('<ul>')
+        html.write("<details>")
+    html.write("<summary>%s</summary>" % node.get(KEY_CLASS, DEFAULT_VIEW_CLASS))
+    html.write("<ul>")
     for item in sorted(node):
         if item == KEY_CHILDREN or item == KEY_CLASS:
             continue
-        html.write('<li><strong>%s:</strong> %s</li>' % (item, node[item]))
+        html.write("<li><strong>%s:</strong> %s</li>" % (item, node[item]))
 
-    html.write('</ul>')
+    html.write("</ul>")
     if KEY_CHILDREN in node and node[KEY_CHILDREN]:
         for child in node[KEY_CHILDREN]:
             write_view_hierarchy_tree_node(child, html, parent_id, with_overlay_target)
 
-    html.write('</details>')
+    html.write("</details>")
 
 
 def write_view_hierarchy_overlay_nodes(hierarchy, html, parent_id):
@@ -291,41 +303,41 @@ def get_view_hierarchy_overlay_node_id(node):
 
 
 def get_view_hierarchy(dir, screenshot):
-    json_path = join(dir, screenshot.find('name').text + "_dump.json")
+    json_path = join(dir, screenshot["name"] + "_dump.json")
     if not os.path.exists(json_path):
         return None
-    with codecs.open(json_path, mode="r", encoding='utf-8') as dump:
+    with codecs.open(json_path, mode="r", encoding="utf-8") as dump:
         return json.loads(dump.read())
 
 
 def write_image(hierarchy, dir, html, screenshot, parent_id, comparing):
     html.write('<div class="img-block">')
     if comparing:
-        html.write('New Output')
+        html.write("New Output")
     html.write('<div class="img-wrapper">')
-    html.write('<table>')
-    for y in range(int(screenshot.find('tile_height').text)):
-        html.write('<tr>')
-        for x in range(int(screenshot.find('tile_width').text)):
-            html.write('<td>')
-            image_file = "./" + common.get_image_file_name(screenshot.find('name').text, x, y)
+    html.write("<table>")
+    for y in range(int(screenshot["tileHeight"])):
+        html.write("<tr>")
+        for x in range(int(screenshot["tileWidth"])):
+            html.write("<td>")
+            image_file = "./" + common.get_image_file_name(screenshot["name"], x, y)
 
             if os.path.exists(join(dir, image_file)):
                 html.write('<img src="%s" />' % image_file)
 
-            html.write('</td>')
-        html.write('</tr>')
-    html.write('</table>')
+            html.write("</td>")
+        html.write("</tr>")
+    html.write("</table>")
     html.write('<div class="hierarchy-overlay">')
     write_view_hierarchy_overlay_nodes(hierarchy, html, parent_id)
-    html.write('</div></div></div>')
+    html.write("</div></div></div>")
 
 
 def write_image_diff(old_screenshot_url, dir, html, screenshot):
     from PIL import Image, ImageChops, ImageOps
 
     html.write('<div class="img-block">')
-    html.write('Diff')
+    html.write("Diff")
     html.write('<div class="img-wrapper">')
 
     old_image = Image.open(urllib.urlopen(old_screenshot_url))
@@ -333,9 +345,11 @@ def write_image_diff(old_screenshot_url, dir, html, screenshot):
 
     # combine all tiles back into one image to ease the comparison
     x_offset = y_offset = height = 0
-    for y in range(int(screenshot.find('tile_height').text)):
-        for x in range(int(screenshot.find('tile_width').text)):
-            image_file = join(dir, "./" + common.get_image_file_name(screenshot.find('name').text, x, y))
+    for y in range(int(screenshot["tileHeight"])):
+        for x in range(int(screenshot["tileWidth"])):
+            image_file = join(
+                dir, "./" + common.get_image_file_name(screenshot["name"], x, y)
+            )
             if os.path.exists(image_file):
                 img = Image.open(image_file)
                 new_image.paste(img, (x_offset, y_offset))
@@ -344,25 +358,29 @@ def write_image_diff(old_screenshot_url, dir, html, screenshot):
         x_offset = 0
         y_offset += height
 
-    difference = ImageChops.difference(old_image, new_image).convert('RGB')
+    difference = ImageChops.difference(old_image, new_image).convert("RGB")
     difference = ImageOps.invert(difference)
 
     with tempfile.NamedTemporaryFile(delete=False, suffix=".png") as fp:
         difference.save(fp)
         html.write('<img src="%s" />' % fp.name)
-    html.write('</div></div>')
+    html.write("</div></div>")
 
 
 def test_for_wkhtmltoimage():
-    if subprocess.call(['which', 'wkhtmltoimage']) != 0:
-        raise RuntimeError("""Could not find wkhtmltoimage in your path, we need this for generating pngs
+    if subprocess.call(["which", "wkhtmltoimage"]) != 0:
+        raise RuntimeError(
+            """Could not find wkhtmltoimage in your path, we need this for generating pngs
 Download an appropriate version from:
-    http://wkhtmltopdf.org/downloads.html""")
+    http://wkhtmltopdf.org/downloads.html"""
+        )
 
 
 def generate_png(path_to_html, path_to_png):
     test_for_wkhtmltoimage()
-    subprocess.check_call(['wkhtmltoimage', path_to_html, path_to_png], stdout=sys.stdout)
+    subprocess.check_call(
+        ["wkhtmltoimage", path_to_html, path_to_png], stdout=sys.stdout
+    )
 
 
 def copy_assets(destination):
@@ -388,8 +406,8 @@ def _copy_file(src, dest):
 def _copy_via_zip(src_zip, zip_path, dest):
     if os.path.exists(src_zip):
         zip = zipfile.ZipFile(src_zip)
-        input = zip.open(zip_path, 'r')
-        with open(dest, 'wb') as output:
+        input = zip.open(zip_path, "r")
+        with open(dest, "wb") as output:
             output.write(input.read())
     else:
         # walk up the tree
@@ -421,115 +439,128 @@ def android_path_join(a, *args):
 
 
 def pull_metadata(package, dir, adb_puller):
-    root_screenshot_dir = android_path_join(adb_puller.get_external_data_dir(), "screenshots")
+    root_screenshot_dir = android_path_join(
+        adb_puller.get_external_data_dir(), "screenshots"
+    )
     metadata_file = android_path_join(
-        root_screenshot_dir,
-        package,
-        'screenshots-default/metadata.xml')
+        root_screenshot_dir, package, "screenshots-default/metadata.json"
+    )
 
     old_metadata_file = android_path_join(
-        OLD_ROOT_SCREENSHOT_DIR,
-        package,
-        'app_screenshots-default/metadata.xml')
+        OLD_ROOT_SCREENSHOT_DIR, package, "app_screenshots-default/metadata.json"
+    )
 
     if adb_puller.remote_file_exists(metadata_file):
-        adb_puller.pull(metadata_file, join(dir, 'metadata.xml'))
+        adb_puller.pull(metadata_file, join(dir, "metadata.json"))
     elif adb_puller.remote_file_exists(old_metadata_file):
-        adb_puller.pull(old_metadata_file, join(dir, 'metadata.xml'))
+        adb_puller.pull(old_metadata_file, join(dir, "metadata.json"))
         metadata_file = old_metadata_file
     else:
         create_empty_metadata_file(dir)
 
-    return metadata_file.replace("metadata.xml", "")
+    return metadata_file.replace("metadata.json", "")
 
 
 def create_empty_metadata_file(dir):
-    with open(join(dir, 'metadata.xml'), 'w') as out:
-        out.write(
-
-            """<?xml version="1.0" encoding="UTF-8"?>
-        <screenshots>
-        </screenshots>""")
+    with open(join(dir, "metadata.json"), "w") as out:
+        out.write("{}")
 
 
-def pull_images(dir, device_dir, adb_puller):
-    bundle_name = 'screenshot_bundle.zip'
-    if adb_puller.remote_file_exists(android_path_join(device_dir, bundle_name)):
-        bundle_name_local_file = join(dir, os.path.basename(bundle_name))
+def pull_images(dir, device_dir, test_run_id, adb_puller, bundle_results=False):
+    if adb_puller.remote_file_exists(android_path_join(device_dir, test_run_id)):
+        bundle_name_local_file = join(dir, os.path.basename(test_run_id))
 
         # Optimization to pull down all the screenshots in a single pull.
         # If this file exists, we assume all of the screenshots are inside it.
-        adb_puller.pull(android_path_join(device_dir, bundle_name),
-                                bundle_name_local_file)
-        # Now unzip, to maintain normal behavior
-        with zipfile.ZipFile(bundle_name_local_file, 'r') as zipObj:
-            zipObj.extractall(dir)
-        names = zipObj.namelist()
-        print("Pulled %d files from device" % len(names))
-        # and clean up
-        os.remove(bundle_name_local_file)
-    else:
-        root = ET.parse(join(dir, 'metadata.xml')).getroot()
-        for s in root.iter('screenshot'):
-            filename_nodes = s.findall('relative_file_name')
-            for filename_node in filename_nodes:
-                class_name = s.find('test_class').text
-                class_path = join(dir, class_name)
-                if not os.path.exists(class_path):
-                    os.makedirs(class_path)
-                adb_puller.pull(
-                    android_path_join(device_dir, filename_node.text),
-                    join(class_path, os.path.basename(filename_node.text)))
-            dump_node = s.find('view_hierarchy')
-            if dump_node is not None:
-                adb_puller.pull(android_path_join(device_dir, dump_node.text),
-                                join(dir, os.path.basename(dump_node.text)))
+        pulling_function = adb_puller.pull_folder if bundle_results else adb_puller.pull
+        pulling_function(
+            android_path_join(device_dir, test_run_id), bundle_name_local_file
+        )
+
+        move_all_files_to_different_directory(bundle_name_local_file, dir)
+        # clean up
+        shutil.rmtree(bundle_name_local_file)
 
 
-def pull_all(package, dir, adb_puller):
+def pull_all(package, dir, test_run_id, adb_puller):
     device_dir = pull_metadata(package, dir, adb_puller=adb_puller)
-    pull_images(dir, device_dir, adb_puller=adb_puller)
+    pull_images(dir, device_dir, test_run_id, adb_puller=adb_puller)
 
 
-def pull_filtered(package, dir, adb_puller, filter_name_regex=None):
+def pull_filtered(
+        package,
+        dir,
+        adb_puller,
+        test_run_id,
+        filter_name_regex=None,
+        bundle_results=False,
+):
     device_dir = pull_metadata(package, dir, adb_puller=adb_puller)
     _validate_metadata(dir)
-    metadata.filter_screenshots(join(dir, 'metadata.xml'), name_regex=filter_name_regex)
-    pull_images(dir, device_dir, adb_puller=adb_puller)
+    metadata.filter_screenshots(
+        join(dir, "metadata.json"), name_regex=filter_name_regex
+    )
+    pull_images(
+        dir,
+        device_dir,
+        test_run_id,
+        adb_puller=adb_puller,
+        bundle_results=bundle_results,
+    )
+
+
+def move_all_files_to_different_directory(source_dir, target_dir):
+    file_names = os.listdir(source_dir)
+    for file_name in file_names:
+        shutil.move(
+            os.path.join(source_dir, file_name), os.path.join(target_dir, file_name)
+        )
 
 
 def _summary(dir):
-    root = ET.parse(join(dir, 'metadata.xml')).getroot()
-    count = len(root.findall('screenshot'))
+    with open(join(dir, "metadata.json")) as f:
+        metadataJson = json.load(f)
+    count = len(metadataJson)
     print("Found %d screenshots" % count)
 
 
 def _validate_metadata(dir):
     try:
-        ET.parse(join(dir, 'metadata.xml'))
-    except ET.ParseError:
+        with open(join(dir, "metadata.json"), "r") as f:
+            json.loads(f.read())
+    except Exception as e:
         raise RuntimeError(
-            "Unable to parse metadata file, this commonly happens if you did not call ScreenshotRunner.onDestroy() from your instrumentation")
+            "Unable to parse metadata file, this commonly happens if you did not call ScreenshotRunner.onDestroy() from your instrumentation",
+            e,
+        )
 
 
-def pull_screenshots(process,
-                     adb_puller,
-                     device_name_calculator=None,
-                     perform_pull=True,
-                     temp_dir=None,
-                     filter_name_regex=None,
-                     record=None,
-                     keep_old_record=None,
-                     verify=None,
-                     opt_generate_png=None,
-                     test_img_api=None,
-                     old_imgs_data=None,
-                     failure_dir=None,
-                     diff=False):
+def pull_screenshots(
+        process,
+        adb_puller,
+        device_name_calculator=None,
+        perform_pull=True,
+        bundle_results=False,
+        temp_dir=None,
+        filter_name_regex=None,
+        record=None,
+        verify=None,
+        test_run_id=None,
+        opt_generate_png=None,
+        test_img_api=None,
+        old_imgs_data=None,
+        failure_dir=None,
+        diff=False,
+        open_html=False,
+):
     if not perform_pull and temp_dir is None:
-        raise RuntimeError("""You must supply a directory for temp_dir if --no-pull is present""")
+        raise RuntimeError(
+            """You must supply a directory for temp_dir if --no-pull is present"""
+        )
+    if not perform_pull and test_run_id is None:
+        raise RuntimeError("""You must supply a test run id if --no-pull is present""")
 
-    temp_dir = temp_dir or tempfile.mkdtemp(prefix='screenshots')
+    temp_dir = temp_dir or tempfile.mkdtemp(prefix="screenshots")
 
     if not os.path.exists(temp_dir):
         os.makedirs(temp_dir)
@@ -537,8 +568,14 @@ def pull_screenshots(process,
     copy_assets(temp_dir)
 
     if perform_pull is True:
-        pull_filtered(process, adb_puller=adb_puller, dir=temp_dir,
-                      filter_name_regex=filter_name_regex)
+        pull_filtered(
+            process,
+            adb_puller=adb_puller,
+            dir=temp_dir,
+            test_run_id=test_run_id,
+            filter_name_regex=filter_name_regex,
+            bundle_results=bundle_results,
+        )
 
     _validate_metadata(temp_dir)
 
@@ -555,11 +592,12 @@ def pull_screenshots(process,
     if record or verify:
         # don't import this early, since we need PIL to import this
         from .recorder import Recorder
+
         recorder = Recorder(temp_dir, record_dir or verify_dir, failure_dir)
         if verify:
             recorder.verify()
         else:
-            recorder.record(keep_old_record is None)
+            recorder.record()
 
     if opt_generate_png:
         generate_png(path_to_html, opt_generate_png)
@@ -567,14 +605,20 @@ def pull_screenshots(process,
     else:
         print("\n\n")
         _summary(temp_dir)
-        print('Open the following url in a browser to view the results: ')
-        print('  file://%s' % path_to_html)
+        print("Open the following url in a browser to view the results: ")
+        full_path = "file://" + path_to_html
+        print("  %s" % full_path)
         print("\n\n")
+        if open_html:
+            if platform.system() == "Darwin":  # macOS
+                subprocess.call(("open", full_path))
+            elif platform.system() == "Windows":  # Windows
+                os.startfile(full_path)
 
 
 def setup_paths():
     android_home = common.get_android_sdk()
-    os.environ['PATH'] = os.environ['PATH'] + ":" + android_home + "/platform-tools/"
+    os.environ["PATH"] = os.environ["PATH"] + ":" + android_home + "/platform-tools/"
 
 
 def main(argv):
@@ -583,8 +627,20 @@ def main(argv):
         opt_list, rest_args = getopt.gnu_getopt(
             argv[1:],
             "eds:",
-            ["generate-png=", "filter-name-regex=", "apk", "record=", "verify=", "failure-dir=",
-             "temp-dir=", "no-pull", "multiple-devices=", "keep-old-record"])
+            [
+                "generate-png=",
+                "filter-name-regex=",
+                "apk",
+                "record=",
+                "verify=",
+                "failure-dir=",
+                "temp-dir=",
+                "no-pull",
+                "multiple-devices=",
+                "test-run-id=",
+                "bundle-results",
+            ],
+        )
     except getopt.GetoptError:
         usage()
         return 2
@@ -601,10 +657,13 @@ def main(argv):
         # treat process as an apk instead
         process = aapt.get_package(process)
 
-    should_perform_pull = ("--no-pull" not in opts)
+    should_perform_pull = "--no-pull" not in opts
+    bundle_results = "--bundle-results" in opts
 
-    multiple_devices = opts.get('--multiple-devices')
-    device_calculator = DeviceNameCalculator() if multiple_devices else NoOpDeviceNameCalculator()
+    multiple_devices = opts.get("--multiple-devices")
+    device_calculator = (
+        DeviceNameCalculator() if multiple_devices else NoOpDeviceNameCalculator()
+    )
 
     base_puller_args = []
     if "-e" in opts:
@@ -614,30 +673,36 @@ def main(argv):
         base_puller_args.append("-d")
 
     if "-s" in opts:
-        passed_serials = [opts['-s']]
+        passed_serials = [opts["-s"]]
     elif "ANDROID_SERIAL" in os.environ:
-        passed_serials = os.environ.get('ANDROID_SERIAL').split(",")
+        passed_serials = os.environ.get("ANDROID_SERIAL").split(",")
     else:
         passed_serials = common.get_connected_devices()
 
     if passed_serials:
-        puller_args_list = [base_puller_args + ["-s", serial] for serial in passed_serials]
+        puller_args_list = [
+            base_puller_args + ["-s", serial] for serial in passed_serials
+        ]
     else:
         puller_args_list = [base_puller_args]
 
     for puller_args in puller_args_list:
-        pull_screenshots(process,
-                         perform_pull=should_perform_pull,
-                         temp_dir=opts.get('--temp-dir'),
-                         filter_name_regex=opts.get('--filter-name-regex'),
-                         opt_generate_png=opts.get('--generate-png'),
-                         record=opts.get('--record'),
-                         keep_old_record=opts.get('--keep-old-record'),
-                         verify=opts.get('--verify'),
-                         adb_puller=SimplePuller(puller_args),
-                         device_name_calculator=device_calculator,
-                         failure_dir=opts.get("--failure-dir"))
+        pull_screenshots(
+            process,
+            perform_pull=should_perform_pull,
+            temp_dir=opts.get("--temp-dir"),
+            filter_name_regex=opts.get("--filter-name-regex"),
+            opt_generate_png=opts.get("--generate-png"),
+            test_run_id=opts.get("--test-run-id"),
+            record=opts.get("--record"),
+            verify=opts.get("--verify"),
+            adb_puller=SimplePuller(puller_args),
+            device_name_calculator=device_calculator,
+            failure_dir=opts.get("--failure-dir"),
+            open_html=opts.get("--open-html"),
+            bundle_results=bundle_results,
+        )
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     sys.exit(main(sys.argv))
