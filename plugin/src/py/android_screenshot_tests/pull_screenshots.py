@@ -1,4 +1,8 @@
 #!/usr/bin/env python3
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+from __future__ import unicode_literals
 
 import codecs
 import getopt
@@ -39,10 +43,7 @@ DEFAULT_VIEW_CLASS = "android.view.View"
 
 
 def usage():
-    print(
-        "usage: ./scripts/screenshot_tests/pull_screenshots com.facebook.apk.name.tests [--generate-png]",
-        file=sys.stderr
-    )
+    print("usage: ./scripts/screenshot_tests/pull_screenshots com.facebook.apk.name.tests [--generate-png]", file=sys.stderr)
     return
 
 
