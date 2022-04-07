@@ -41,7 +41,7 @@ DEFAULT_VIEW_CLASS = "android.view.View"
 def usage():
     print(
         "usage: ./scripts/screenshot_tests/pull_screenshots com.facebook.apk.name.tests [--generate-png]",
-        file=sys.stderr,
+        file=sys.stderr
     )
     return
 
