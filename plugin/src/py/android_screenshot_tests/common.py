@@ -16,10 +16,10 @@ def get_image_file_name(name, x, y):
 
 
 def get_android_sdk():
-    android_sdk = os.environ.get("ANDROID_SDK") or os.environ.get("ANDROID_HOME")
+    android_sdk = os.environ.get("ANDROID_SDK_ROOT") or os.environ.get("ANDROID_HOME")
 
     if not android_sdk:
-        raise RuntimeError("ANDROID_SDK or ANDROID_HOME needs to be set")
+        raise RuntimeError("ANDROID_SDK_ROOT or ANDROID_HOME needs to be set")
 
     return os.path.expanduser(android_sdk)
 
