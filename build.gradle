@@ -3,8 +3,9 @@ apply plugin: 'com.github.ben-manes.versions'
 buildscript {
   apply from: rootProject.file('versions.gradle')
   repositories {
-    jcenter()
+    mavenCentral()
     google()
+    jcenter()
   }
 
   dependencies {
@@ -18,8 +19,9 @@ buildscript {
 allprojects {
   version = property('VERSION_NAME')
   repositories {
-    jcenter()
+    mavenCentral()
     google()
+    jcenter()
   }
 }
 
