@@ -6,7 +6,6 @@ import com.android.build.gradle.TestedExtension
 import com.android.build.gradle.api.ApkVariantOutput
 import com.android.build.gradle.api.TestVariant
 import com.android.build.gradle.internal.tasks.factory.dependsOn
-import com.agoda.testing.screenshot.generated.ScreenshotTestBuildConfig
 import java.util.UUID
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -50,7 +49,7 @@ class ScreenshotsPlugin : Plugin<Project> {
       if (screenshotExtensions.addDeps) {
         it.dependencies.add(
             "androidTestImplementation",
-            "$DEPENDENCY_GROUP:$DEPENDENCY_CORE:${ScreenshotTestBuildConfig.VERSION}")
+            "$DEPENDENCY_GROUP:$DEPENDENCY_CORE:0.15.0")
       }
     }
     val androidExtension = getProjectExtension(project)
