@@ -29,7 +29,7 @@ class Recorder:
         with Image.open(file_name) as im:
             return im.size
 
-    def _copy(self, name, w, h):
+    def _copy(self, name, classname, method, w, h):
         tilewidth, tileheight = self._get_image_size(
             join(self._input, common.get_image_file_name(name, 0, 0))
         )
@@ -55,7 +55,10 @@ class Recorder:
                     im.paste(input_image, (i * tilewidth, j * tileheight))
                     input_image.close()
 
-        im.save(join(self._output, name + ".png"))
+        output_path = join(self._output, classname)
+        if not os.path.exists(output_path):
+            os.makedirs(output_path)
+        im.save(join(output_path, method + ".png"))
         im.close()
 
     def _get_metadata_json(self):
@@ -67,6 +70,8 @@ class Recorder:
         for screenshot in metadata:
             self._copy(
                 screenshot["name"],
+                screenshot["test_class"],
+                screenshot["test_name"],
                 int(screenshot["tileWidth"]),
                 int(screenshot["tileHeight"]),
             )
@@ -104,9 +109,10 @@ class Recorder:
         screenshots = self._get_metadata_json()
         failures = []
         for screenshot in screenshots:
-            name = screenshot["name"] + ".png"
-            actual = join(self._output, name)
-            expected = join(self._realoutput, name)
+            test_class = screenshot["test_class"]
+            test_method = screenshot["test_name"]
+            actual = join(join(self._output, test_class), test_method + ".png")
+            expected = join(join(self._realoutput, test_class), test_method + ".png")
             if self._failure_output:
                 diff_name = screenshot["name"] + "_diff.png"
                 diff = join(self._failure_output, diff_name)
@@ -115,8 +121,8 @@ class Recorder:
                     expected_name = screenshot["name"] + "_expected.png"
                     actual_name = screenshot["name"] + "_actual.png"
 
-                    shutil.copy(actual, join(self._failure_output, actual_name))
-                    shutil.copy(expected, join(self._failure_output, expected_name))
+                    shutil.copy(actual, join(diff, actual_name))
+                    shutil.copy(expected, join(diff, expected_name))
 
                     failures.append((expected, actual))
             else:
