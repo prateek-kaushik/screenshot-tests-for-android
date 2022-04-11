@@ -4,4 +4,3 @@ class NoOpDeviceNameCalculator:
 
     def name(self):
         return ""
-
