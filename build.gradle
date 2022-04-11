@@ -3,7 +3,7 @@ apply plugin: 'com.github.ben-manes.versions'
 buildscript {
   apply from: rootProject.file('versions.gradle')
   repositories {
-    mavenCentral()
+//    mavenCentral()
     google()
     jcenter()
   }
@@ -11,15 +11,15 @@ buildscript {
   dependencies {
     classpath plugs.agp
     classpath plugs.versions
-    classpath plugs.publish
-    classpath plugs.dokka
+//    classpath plugs.publish
+//    classpath plugs.dokka
   }
 }
 
 allprojects {
   version = property('VERSION_NAME')
   repositories {
-    mavenCentral()
+//    mavenCentral()
     google()
     jcenter()
   }
