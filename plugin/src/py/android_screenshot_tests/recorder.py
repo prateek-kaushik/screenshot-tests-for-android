@@ -29,7 +29,7 @@ class Recorder:
         with Image.open(file_name) as im:
             return im.size
 
-    def _copy(self, name, classname, method, w, h):
+    def _copy(self, name, w, h):
         tilewidth, tileheight = self._get_image_size(
             join(self._input, common.get_image_file_name(name, 0, 0))
         )
