@@ -1,6 +1,7 @@
 package com.agoda.testing.screenshot.build
 
 import com.android.build.gradle.api.TestVariant
+import com.agoda.testing.screenshot.generated.ScreenshotTestBuildConfig
 
 open class RunScreenshotTestTask : PullScreenshotsTask() {
   companion object {

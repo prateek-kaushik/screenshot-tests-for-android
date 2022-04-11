@@ -1,10 +1,14 @@
 buildscript {
   repositories {
-    google()
     mavenCentral()
+    google()
+    mavenLocal()
+    jcenter()
   }
   dependencies {
     classpath plugs.kotlin
+    classpath plugs.publish
+    classpath plugs.dokka
   }
 }
 
@@ -12,11 +16,35 @@ apply plugin: 'groovy'
 apply plugin: 'kotlin'
 apply plugin: "java-gradle-plugin"
 apply plugin: "maven-publish"
+apply plugin: 'com.vanniktech.maven.publish'
+
+final GENERATED_PACKAGE_NAME = "com.agoda.testing.screenshot.generated"
+final GENERATED_BUILD_DIR =
+    new File(
+        projectDir.absolutePath,
+        "src/generated/kotlin/${GENERATED_PACKAGE_NAME.replace('.', '/')}")
+
+task generateBuildConfig {
+  doLast {
+    GENERATED_BUILD_DIR.deleteDir()
+    GENERATED_BUILD_DIR.mkdirs()
+
+    final className = "ScreenshotTestBuildConfig"
+    final configClass = new File(GENERATED_BUILD_DIR, "${className}.kt")
+    BufferedWriter writer = configClass.newWriter()
+    try {
+      writer.writeLine("package $GENERATED_PACKAGE_NAME")
+      writer.writeLine("object $className { val VERSION = \"${project.version.toString()}\" }")
+      writer.flush()
+    } finally {
+      writer.close()
+    }
+  }
+}
 
 dependencies {
   implementation deps.kotlinStdlib
   compileOnly plugs.agp
-
   testImplementation deps.junit
   testImplementation plugs.agp
   testImplementation deps.mockito
@@ -38,7 +66,7 @@ compileJava {
 
 task pyTests(type: Exec) {
   workingDir file('./src/py')
-  commandLine 'python', '-m', 'unittest', 'discover'
+  commandLine 'python3', '-m', 'unittest', 'discover'
 }
 
 task py3Tests(type: Exec) {

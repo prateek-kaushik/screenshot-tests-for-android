@@ -1,13 +1,15 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
+import os
+import shutil
 import tempfile
 import unittest
-import shutil
-import os
 from os.path import join, exists
-from .recorder import Recorder, VerifyError
 
 from PIL import Image
+
+from .recorder import Recorder, VerifyError
+
 
 class TestRecorder(unittest.TestCase):
     def setUp(self):
@@ -28,7 +30,7 @@ class TestRecorder(unittest.TestCase):
         return filename
 
     def make_metadata(self, str):
-        with open(os.path.join(self.inputdir, "metadata.xml"), "w") as f:
+        with open(os.path.join(self.inputdir, "metadata.json"), "w") as f:
             f.write(str)
 
     def tearDown(self):
@@ -44,45 +46,47 @@ class TestRecorder(unittest.TestCase):
 
     def test_recorder_creates_dir(self):
         shutil.rmtree(self.outputdir)
-        self.make_metadata("""<screenshots></screenshots>""")
+        self.make_metadata("""[]""")
         self.recorder.record()
 
         self.assertTrue(os.path.exists(self.outputdir))
 
     def test_single_input(self):
-        self.create_temp_image("Foo", "foobar.png", (10, 10), "blue")
-        self.make_metadata("""<screenshots>
-    <screenshot>
-       <name>foobar</name>
-       <test_class>Foo</test_class>
-       <test_name>Bar</test_name>
-       <tile_width>1</tile_width>
-       <tile_height>1</tile_height>
-    </screenshot>
-    </screenshots>""")
+        self.create_temp_image("foobar.png", (10, 10), "blue")
+        self.make_metadata(
+            # language=json
+            """
+            [
+                {
+                    "name": "foobar",
+                    "tileWidth": 1,
+                    "tileHeight": 1
+                }
+            ]"""
+        )
 
         self.recorder.record()
         self.assertTrue(exists(join(join(self.outputdir, "Foo"), "Bar.png")))
 
     def test_two_files(self):
-        self.create_temp_image("Foo", "foo.png", (10, 10), "blue")
-        self.create_temp_image("Bar", "bar.png", (10, 10), "red")
-        self.make_metadata("""<screenshots>
-    <screenshot>
-       <test_class>Foo</test_class>
-       <test_name>foo</test_name>
-       <name>foo</name>
-       <tile_width>1</tile_width>
-       <tile_height>1</tile_height>
-    </screenshot>
-    <screenshot>
-       <test_class>Bar</test_class>
-       <test_name>bar</test_name>
-       <name>bar</name>
-       <tile_width>1</tile_width>
-       <tile_height>1</tile_height>
-    </screenshot>
-    </screenshots>""")
+        self.create_temp_image("foo.png", (10, 10), "blue")
+        self.create_temp_image("bar.png", (10, 10), "red")
+        self.make_metadata(
+            # language=json
+            """
+            [
+                {
+                    "name": "foo",
+                    "tileWidth": 1,
+                    "tileHeight": 1
+                },
+                {
+                    "name": "bar",
+                    "tileWidth": 1,
+                    "tileHeight": 1
+                }
+            ]"""
+        )
 
         self.recorder.record()
         self.assertTrue(exists(join(join(self.outputdir, "Foo"), "foo.png")))
@@ -92,15 +96,17 @@ class TestRecorder(unittest.TestCase):
         self.create_temp_image("Foo", "foobar.png", (10, 10), "blue")
         self.create_temp_image("Foo", "foobar_0_1.png", (10, 10), "red")
 
-        self.make_metadata("""<screenshots>
-    <screenshot>
-       <test_class>Foo</test_class>
-       <test_name>Bar</test_name>
-       <name>foobar</name>
-        <tile_width>1</tile_width>
-        <tile_height>2</tile_height>
-    </screenshot>
-    </screenshots>""")
+        self.make_metadata(
+            # language=json
+            """
+            [
+                {
+                    "name": "foobar",
+                    "tileWidth": 1,
+                    "tileHeight": 2
+                }
+            ]"""
+        )
 
         self.recorder.record()
 
@@ -117,15 +123,17 @@ class TestRecorder(unittest.TestCase):
         self.create_temp_image("Foo", "foobar.png", (10, 10), "blue")
         self.create_temp_image("Foo", "foobar_1_0.png", (10, 10), "red")
 
-        self.make_metadata("""<screenshots>
-    <screenshot>
-       <test_class>Foo</test_class>
-       <test_name>Bar</test_name>
-       <name>foobar</name>
-        <tile_width>2</tile_width>
-        <tile_height>1</tile_height>
-    </screenshot>
-    </screenshots>""")
+        self.make_metadata(
+            # language=json
+            """
+            [
+                {
+                    "name": "foobar",
+                    "tileWidth": 2,
+                    "tileHeight": 1
+                }
+            ]"""
+        )
 
         self.recorder.record()
 
@@ -143,15 +151,17 @@ class TestRecorder(unittest.TestCase):
         self.create_temp_image("Foo", "foobar_0_1.png", (10, 8), "red")
         self.create_temp_image("Foo", "foobar_1_1.png", (9, 8), "blue")
 
-        self.make_metadata("""<screenshots>
-    <screenshot>
-       <test_class>Foo</test_class>
-       <test_name>Bar</test_name>
-       <name>foobar</name>
-        <tile_width>2</tile_width>
-        <tile_height>2</tile_height>
-    </screenshot>
-    </screenshots>""")
+        self.make_metadata(
+            # language=json
+            """
+            [
+                {
+                    "name": "foobar",
+                    "tileWidth": 2,
+                    "tileHeight": 2
+                }
+            ]"""
+        )
 
         self.recorder.record()
 
@@ -167,40 +177,36 @@ class TestRecorder(unittest.TestCase):
             self.assertEqual((255, 0, 0, 255), im.getpixel((1, 11)))
 
     def test_verify_success(self):
-        self.create_temp_image("Foo", "foo.png", (10, 10), "blue")
-        self.create_temp_image("Bar", "bar.png", (10, 10), "red")
-        self.make_metadata("""<screenshots>
-            <screenshot>
-               <test_class>Foo</test_class>
-               <test_name>foo</test_name>
-               <name>foo</name>
-               <tile_width>1</tile_width>
-               <tile_height>1</tile_height>
-            </screenshot>
-            <screenshot>
-               <test_class>Bar</test_class>
-               <test_name>bar</test_name>
-               <name>bar</name>
-               <tile_width>1</tile_width>
-               <tile_height>1</tile_height>
-            </screenshot>
-            </screenshots>""")
+       self.create_temp_image("foobar.png", (10, 10), "blue")
+        self.make_metadata(
+            # language=json
+            """
+            [
+                {
+                    "name": "foobar",
+                    "tileWidth": 1,
+                    "tileHeight": 1
+                }
+            ]"""
+        )
 
         self.recorder.record()
         self.create_temp_image("Bar", "bar.png", (10, 10), "red")
         self.recorder.verify()
 
     def test_verify_failure(self):
-        self.create_temp_image("FooBar", "foobar.png", (10, 10), "blue")
-        self.make_metadata("""<screenshots>
-    <screenshot>
-        <test_class>FooBar</test_class>
-        <test_name>foobar</test_name>
-       <name>foobar</name>
-        <tile_width>1</tile_width>
-        <tile_height>1</tile_height>
-    </screenshot>
-    </screenshots>""")
+        self.create_temp_image("foobar.png", (10, 10), "blue")
+        self.make_metadata(
+            # language=json
+            """
+            [
+                {
+                    "name": "foobar",
+                    "tileWidth": 1,
+                    "tileHeight": 1
+                }
+            ]"""
+        )
 
         self.recorder.record()
         os.unlink(join(join(self.inputdir, "FooBar"), "foobar.png"))
@@ -229,5 +235,5 @@ class TestRecorder(unittest.TestCase):
             self.assertEqual((0, 128, 0, 255), im.getpixel((9, 1)))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

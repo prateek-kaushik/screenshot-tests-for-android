@@ -24,6 +24,10 @@ open class PullScreenshotsTask : ScreenshotTask() {
     @Input
     protected var record = false
 
+    @Input protected var bundleResults = false
+
+    @Input protected lateinit var testRunId: String
+
     @Input
     protected var keepOldRecord = false
 
@@ -40,6 +44,8 @@ open class PullScreenshotsTask : ScreenshotTask() {
                 ?: throw IllegalArgumentException("Can't find package application provider")
 
         apkPath = File(packageTask.outputDirectory.asFile.get(), output.outputFileName)
+        bundleResults = extension.bundleResults
+        testRunId = extension.testRunId
     }
 
     @TaskAction
@@ -57,7 +63,7 @@ open class PullScreenshotsTask : ScreenshotTask() {
         assert(if (isVerifyOnly) outputDir.exists() else !outputDir.exists())
 
         project.exec {
-            it.executable = "python"
+            it.executable = extension.pythonExecutable
             it.environment("PYTHONPATH", jarFile)
 
             it.args = mutableListOf(
@@ -65,8 +71,10 @@ open class PullScreenshotsTask : ScreenshotTask() {
                     "android_screenshot_tests.pull_screenshots",
                     "--apk",
                     apkPath.absolutePath,
+                    "--test-run-id",
+                    testRunId,
                     "--temp-dir",
-                    outputDir.absolutePath
+                    outputDir.absolutePath,
             ).apply {
                 if (verify) {
                     add("--verify")
@@ -96,6 +104,10 @@ open class PullScreenshotsTask : ScreenshotTask() {
 
                 if (isVerifyOnly) {
                     add("--no-pull")
+                }
+
+                if (bundleResults) {
+                    add("--bundle-results")
                 }
 
                 if (keepOldRecord) {
