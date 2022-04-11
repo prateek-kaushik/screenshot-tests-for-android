@@ -55,10 +55,7 @@ class Recorder:
                     im.paste(input_image, (i * tilewidth, j * tileheight))
                     input_image.close()
 
-        output_path = join(self._output, classname)
-        if not os.path.exists(output_path):
-            os.makedirs(output_path)
-        im.save(join(output_path, method + ".png"))
+        im.save(join(self._output, name + ".png"))
         im.close()
 
     def _get_metadata_json(self):
@@ -79,7 +76,7 @@ class Recorder:
             shutil.rmtree(self._output)
         os.makedirs(self._output)
 
-    def _is_image_same(self, name, file1, file2, failure_folder, failure_file):
+    def _is_image_same(self, file1, file2, failure_file):
         with Image.open(file1) as im1, Image.open(file2) as im2:
             diff_image = ImageChops.difference(im1.convert("RGB"), im2.convert("RGB"))
             try:
