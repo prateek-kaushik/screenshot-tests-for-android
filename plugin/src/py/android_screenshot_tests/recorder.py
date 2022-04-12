@@ -70,8 +70,8 @@ class Recorder:
         for screenshot in metadata:
             self._copy(
                 screenshot["name"],
-                screenshot["test_class"],
-                screenshot["test_name"],
+                screenshot["testClass"],
+                screenshot["testName"],
                 int(screenshot["tileWidth"]),
                 int(screenshot["tileHeight"]),
             )
@@ -109,10 +109,10 @@ class Recorder:
         screenshots = self._get_metadata_json()
         failures = []
         for screenshot in screenshots:
-            test_class = screenshot["test_class"]
-            test_method = screenshot["test_name"]
-            actual = join(join(self._output, test_class), test_method + ".png")
-            expected = join(join(self._realoutput, test_class), test_method + ".png")
+            testClass = screenshot["testClass"]
+            test_method = screenshot["testName"]
+            actual = join(join(self._output, testClass), test_method + ".png")
+            expected = join(join(self._realoutput, testClass), test_method + ".png")
             if self._failure_output:
                 diff_name = screenshot["name"] + "_diff.png"
                 diff = join(self._failure_output, diff_name)
