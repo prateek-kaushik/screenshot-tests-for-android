@@ -81,7 +81,7 @@ class Recorder:
             shutil.rmtree(self._output)
         os.makedirs(self._output)
 
-    def _is_image_same(self, file1, file2, failure_file):
+    def _is_image_same(self, file1, file2, failure_folder, failure_file):
         with Image.open(file1) as im1, Image.open(file2) as im2:
             diff_image = ImageChops.difference(im1.convert("RGB"), im2.convert("RGB"))
             try:
@@ -93,7 +93,7 @@ class Recorder:
                         diff_list = list(diff) if diff else []
                         draw = ImageDraw.Draw(im2)
                         draw.rectangle(diff_list, outline=(255, 0, 0))
-                        im2.save(failure_file)
+                        im2.save(join(failure_folder, failure_file))
                     return False
             finally:
                 diff_image.close()
@@ -109,15 +109,15 @@ class Recorder:
         screenshots = self._get_metadata_json()
         failures = []
         for screenshot in screenshots:
-            testClass = screenshot["testClass"]
+            test_class = screenshot["testClass"]
             test_method = screenshot["testName"]
-            actual = join(join(self._output, testClass), test_method + ".png")
-            expected = join(join(self._realoutput, testClass), test_method + ".png")
+            actual = join(join(self._output, test_class), test_method + ".png")
+            expected = join(join(self._realoutput, test_class), test_method + ".png")
             if self._failure_output:
                 diff_name = screenshot["name"] + "_diff.png"
-                diff = join(self._failure_output, diff_name)
+                diff = join(self._failure_output, test_class)
 
-                if not self._is_image_same(expected, actual, diff):
+                if not self._is_image_same(expected, actual, diff, diff_name):
                     expected_name = screenshot["name"] + "_expected.png"
                     actual_name = screenshot["name"] + "_actual.png"
 
