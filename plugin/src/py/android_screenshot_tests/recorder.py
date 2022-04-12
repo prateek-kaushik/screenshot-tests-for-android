@@ -90,6 +90,9 @@ class Recorder:
                     return True
                 else:
                     if failure_file:
+                        if not os.path.exists(failure_folder):
+                            os.makedirs(failure_folder)
+
                         diff_list = list(diff) if diff else []
                         draw = ImageDraw.Draw(im2)
                         draw.rectangle(diff_list, outline=(255, 0, 0))
