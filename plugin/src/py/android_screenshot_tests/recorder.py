@@ -126,7 +126,7 @@ class Recorder:
 
                     failures.append((expected, actual))
             else:
-                if not self._is_image_same(expected, actual, None):
+                if not self._is_image_same(expected, actual, None, None):
                     raise VerifyError("Image %s is not same as %s" % (expected, actual))
 
         if failures:
