@@ -88,8 +88,8 @@ class Recorder:
             try:
                 # Calculate difference as a ratio.
                 stat = ImageStat.Stat(diff_image)
-                diff_ratio = sum(stat.mean) / (len(stat.mean) * 255.0)
-                difference_percent = diff_ratio * 100
+                diff_ratio = (sum(stat.mean) * 1.0) / (len(stat.mean) * 255.0)
+                difference_percent = diff_ratio * 100.0
                 print("difference_percent = %d for expected = %s" % (difference_percent,file1))
                 is_passed = not (difference_percent > 0.05)
 
