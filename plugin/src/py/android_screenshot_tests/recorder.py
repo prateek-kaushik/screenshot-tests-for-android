@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
 
-from __future__ import print_function
-
 import json
 import os
 import shutil
@@ -86,13 +84,10 @@ class Recorder:
         with Image.open(file1) as im1, Image.open(file2) as im2:
             diff_image = ImageChops.difference(im1.convert("RGB"), im2.convert("RGB"))
             try:
-                # Calculate difference as a ratio.
                 stat = ImageStat.Stat(diff_image)
-                print("stat = %s for expected = %s" % (stat,file1))
-                diff_ratio = (sum(stat.mean) * 1.0) / (len(stat.mean) * 255.0)
+                diff_ratio = sum(stat.mean) / (len(stat.mean) * 255)
                 difference_percent = diff_ratio * 100.0
-                print("difference_percent = %d for expected = %s" % (difference_percent,file1))
-                is_passed = not (difference_percent > 0.05)
+                is_passed = not (difference_percent > 1)
 
                 if is_passed and im1.size == im2.size:
                     return True
