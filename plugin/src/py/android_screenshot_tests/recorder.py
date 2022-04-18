@@ -12,6 +12,7 @@ from PIL import Image, ImageChops, ImageDraw, ImageStat
 
 from . import common
 
+from __future__ import print_function
 
 
 class VerifyError(Exception):
@@ -89,6 +90,7 @@ class Recorder:
                 stat = ImageStat.Stat(diff_image)
                 diff_ratio = sum(stat.mean) / (len(stat.mean) * 255.0)
                 difference_percent = diff_ratio * 100
+                print("difference_percent = %d for expected = %s" % (difference_percent,file1))
                 is_passed = not (difference_percent > 0.05)
 
                 if is_passed and im1.size == im2.size:
