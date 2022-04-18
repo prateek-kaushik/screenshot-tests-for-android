@@ -8,7 +8,7 @@ import tempfile
 import xml.etree.ElementTree as ET
 from os.path import join
 
-from PIL import Image, ImageChops, ImageDraw
+from PIL import Image, ImageChops, ImageDraw, ImageStat
 
 from . import common
 
@@ -85,14 +85,19 @@ class Recorder:
         with Image.open(file1) as im1, Image.open(file2) as im2:
             diff_image = ImageChops.difference(im1.convert("RGB"), im2.convert("RGB"))
             try:
-                diff = diff_image.getbbox()
-                if diff is None and im1.size == im2.size:
+                # Calculate difference as a ratio.
+                stat = ImageStat.Stat(diff_image)
+                diff_ratio = sum(stat.mean) / (len(stat.mean) * 255.0)
+                difference_percent = diff_ratio * 100
+                is_passed = not (difference_percent > 0.05)
+
+                if is_passed and im1.size == im2.size:
                     return True
                 else:
                     if failure_file:
                         if not os.path.exists(failure_folder):
                             os.makedirs(failure_folder)
-
+                        diff = diff_image.getbbox()
                         diff_list = list(diff) if diff else []
                         draw = ImageDraw.Draw(im2)
                         draw.rectangle(diff_list, outline=(255, 0, 0))
