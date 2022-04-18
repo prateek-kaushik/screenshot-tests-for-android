@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+from __future__ import print_function
+
 import json
 import os
 import shutil
@@ -11,8 +13,6 @@ from os.path import join
 from PIL import Image, ImageChops, ImageDraw, ImageStat
 
 from . import common
-
-from __future__ import print_function
 
 
 class VerifyError(Exception):
