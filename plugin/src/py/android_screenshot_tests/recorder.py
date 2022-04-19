@@ -85,9 +85,9 @@ class Recorder:
             diff_image = ImageChops.difference(im1.convert("RGB"), im2.convert("RGB"))
             try:
                 stat = ImageStat.Stat(diff_image)
-                diff_ratio = (sum(stat.mean) + 0.0) / (len(stat.mean) * 255.0)
+                diff_ratio = sum(stat.mean) / (len(stat.mean) * 255.0)
                 difference_percent = diff_ratio * 100.0
-                is_passed = not (difference_percent > 1.0)
+                is_passed = not (difference_percent > 0.5)
 
                 print("difference_percent is %1.4f, im1.size is %s, , im2.size is %s for file %s" % (difference_percent, im1.size, im2.size, file1))
 
