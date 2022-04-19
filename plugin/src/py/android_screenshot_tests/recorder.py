@@ -89,6 +89,8 @@ class Recorder:
                 difference_percent = diff_ratio * 100.0
                 is_passed = not (difference_percent > 1)
 
+                print("difference_percent is %d for image %s" (difference_percent, file2))
+
                 if is_passed and im1.size == im2.size:
                     return True
                 else:
