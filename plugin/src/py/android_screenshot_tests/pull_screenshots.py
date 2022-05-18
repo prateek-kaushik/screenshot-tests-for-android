@@ -602,7 +602,7 @@ def pull_screenshots(
         if verify:
             recorder.verify()
         else:
-            recorder.record(keep_old_record is None)
+            recorder.record()
 
     if opt_generate_png:
         generate_png(path_to_html, opt_generate_png)
